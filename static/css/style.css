@@ -1,0 +1,24 @@
+/* ======= STOCKFLOW GLOBAL STYLES ======= */
+:root {
+  --color-forest: #123C32;
+  --color-primary: #16856A;
+  --color-primary-dark: #0F6B55;
+  --color-mint: #E9F5EF;
+  --color-canvas: #F8FAF9;
+  --color-ink: #172B25;
+  --color-muted: #64746D;
+  --color-border: #E2EAE5;
+}
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body { font-family: 'Inter', Arial, sans-serif; background: var(--color-canvas); color: var(--color-ink); }
+button, input, textarea, select { font: inherit; }
+a, button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid rgba(22,133,106,.4); outline-offset: 3px; }
+.container-wide { width: min(100% - 2.5rem, 1200px); margin-inline: auto; }
+.btn-primary, .btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: .55rem; border-radius: .65rem; padding: .85rem 1.35rem; font-size: .875rem; font-weight: 700; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.btn-primary { background: var(--color-primary); color: white; }
+.btn-primary:hover { background: var(--color-primary-dark); transform: translateY(-1px); }
+.btn-outline { border: 1px solid var(--color-border); color: var(--color-forest); background: white; }
+.btn-outline:hover { background: var(--color-mint); border-color: #B5D7C6; }
+@media (max-width: 480px) { .container-wide { width: min(100% - 1.5rem, 1200px); } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }

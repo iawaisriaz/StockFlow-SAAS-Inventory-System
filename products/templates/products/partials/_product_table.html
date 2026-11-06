@@ -1,0 +1,1092 @@
+<section class="rounded-2xl border border-border-light bg-white shadow-card">
+    <!-- ==========================================
+
+         TABLE HEADER
+
+    ========================================== -->
+
+    <div class="flex flex-col gap-5 border-b border-border-light p-5 xl:flex-row xl:items-center xl:justify-between">
+        <div class="shrink-0">
+            <div class="flex items-center gap-3">
+                <h2 class="text-lg font-bold text-dark-green">
+
+                    All Products
+
+                </h2>
+                <span class="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-soft-green px-2 text-xs font-bold text-primary">
+
+                    {{ total_products }}
+
+                </span>
+            </div>
+            <p class="mt-1 text-sm text-text-muted">
+
+                View and manage all your inventory products.
+
+            </p>
+        </div>
+        <!-- ==========================================
+
+             SEARCH AND FILTERS
+
+        ========================================== -->
+
+        <form
+
+            method="get"
+
+            action="{% url 'products:list' %}"
+
+            class="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap xl:w-auto xl:justify-end"
+
+        >
+            <!-- SEARCH -->
+
+            <div class="relative min-w-0 flex-1 sm:min-w-44 xl:w-52">
+                <i
+
+                    data-lucide="search"
+
+                    class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
+
+                ></i>
+                <input
+
+                    type="search"
+
+                    name="q"
+
+                    value="{{ search_query }}"
+
+                    placeholder="Search name or SKU..."
+
+                    class="w-full rounded-xl border border-border-light bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+
+                >
+            </div>
+            <!-- ==========================================
+
+                 CATEGORY FILTER
+
+            ========================================== -->
+
+            <div
+
+                class="relative sm:w-44"
+
+                id="filter-category-wrapper"
+
+            >
+                <input
+
+                    type="hidden"
+
+                    name="category"
+
+                    id="filter-category-value"
+
+                    value="{{ selected_category }}"
+
+                >
+                <!-- TRIGGER -->
+
+                <button
+
+                    type="button"
+
+                    id="filter-category-trigger"
+
+                    aria-expanded="false"
+
+                    aria-haspopup="listbox"
+
+                    class="flex w-full items-center justify-between gap-2 rounded-xl border border-border-light bg-white px-4 py-2.5 text-left text-sm text-text-main transition hover:border-primary/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+
+                >
+                    <span
+
+                        id="filter-category-label"
+
+                        class="truncate"
+
+                    >
+
+                        All Categories
+
+                    </span>
+                    <i
+
+                        data-lucide="chevron-down"
+
+                        class="h-4 w-4 shrink-0 text-text-muted"
+
+                    ></i>
+                </button>
+                <!-- DROPDOWN -->
+
+                <div
+
+                    id="filter-category-dropdown"
+
+                    class="absolute left-0 right-0 top-full z-50 mt-2 hidden min-w-56 overflow-hidden rounded-xl border border-border-light bg-white shadow-xl"
+
+                >
+                    <!-- SEARCH CATEGORIES -->
+
+                    <div class="border-b border-border-light p-2">
+                        <input
+
+                            type="search"
+
+                            id="filter-category-search"
+
+                            placeholder="Search categories..."
+
+                            autocomplete="off"
+
+                            class="w-full rounded-lg border border-border-light px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+
+                        >
+                    </div>
+                    <!-- OPTIONS -->
+
+                    <div class="max-h-52 overflow-y-auto py-1">
+                        <!-- ALL CATEGORIES -->
+
+                        <button
+
+                            type="button"
+
+                            class="filter-category-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                            data-value=""
+
+                            data-label="All Categories"
+
+                        >
+                            <span>All Categories</span>
+                            <i
+
+                                data-lucide="check"
+
+                                class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                            ></i>
+                        </button>
+                        <!-- CATEGORY OPTIONS -->
+
+                        {% for category in categories %}
+                        <button
+
+                            type="button"
+
+                            class="filter-category-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                            data-value="{{ category.pk }}"
+
+                            data-label="{{ category.name }}"
+
+                        >
+                            <span class="truncate">
+
+                                {{ category.name }}
+
+                            </span>
+                            <i
+
+                                data-lucide="check"
+
+                                class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                            ></i>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <!-- NO RESULTS -->
+
+                    <p
+
+                        id="filter-category-empty"
+
+                        class="hidden px-4 py-4 text-center text-sm text-text-muted"
+
+                    >
+
+                        No categories found.
+
+                    </p>
+                </div>
+            </div>
+            <!-- ==========================================
+
+                 STOCK STATUS FILTER
+
+            ========================================== -->
+
+            <div
+
+                class="relative sm:w-40"
+
+                id="filter-stock-wrapper"
+
+            >
+                <input
+
+                    type="hidden"
+
+                    name="stock"
+
+                    id="filter-stock-value"
+
+                    value="{{ selected_stock }}"
+
+                >
+                <!-- TRIGGER -->
+
+                <button
+
+                    type="button"
+
+                    id="filter-stock-trigger"
+
+                    aria-expanded="false"
+
+                    aria-haspopup="listbox"
+
+                    class="flex w-full items-center justify-between gap-2 rounded-xl border border-border-light bg-white px-4 py-2.5 text-left text-sm text-text-main transition hover:border-primary/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+
+                >
+                    <span
+
+                        id="filter-stock-label"
+
+                        class="truncate"
+
+                    >
+
+                        All Stock
+
+                    </span>
+                    <i
+
+                        data-lucide="chevron-down"
+
+                        class="h-4 w-4 shrink-0 text-text-muted"
+
+                    ></i>
+                </button>
+                <!-- DROPDOWN -->
+
+                <div
+
+                    id="filter-stock-dropdown"
+
+                    class="absolute left-0 right-0 top-full z-50 mt-2 hidden min-w-44 overflow-hidden rounded-xl border border-border-light bg-white py-1 shadow-xl"
+
+                >
+                    <!-- ALL STOCK -->
+
+                    <button
+
+                        type="button"
+
+                        class="filter-stock-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value=""
+
+                        data-label="All Stock"
+
+                    >
+                        <span>All Stock</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- IN STOCK -->
+
+                    <button
+
+                        type="button"
+
+                        class="filter-stock-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="in_stock"
+
+                        data-label="In Stock"
+
+                    >
+                        <span>In Stock</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- LOW STOCK -->
+
+                    <button
+
+                        type="button"
+
+                        class="filter-stock-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="low_stock"
+
+                        data-label="Low Stock"
+
+                    >
+                        <span>Low Stock</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- OUT OF STOCK -->
+
+                    <button
+
+                        type="button"
+
+                        class="filter-stock-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="out_of_stock"
+
+                        data-label="Out of Stock"
+
+                    >
+                        <span>Out of Stock</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                </div>
+            </div>
+            <!-- ==========================================
+
+                 COST REVIEW FILTER
+
+            ========================================== -->
+
+            <div
+
+                class="relative sm:w-48"
+
+                id="filter-review-wrapper"
+
+            >
+                <input
+
+                    type="hidden"
+
+                    name="review"
+
+                    id="filter-review-value"
+
+                    value="{{ selected_review }}"
+
+                >
+                <!-- TRIGGER -->
+
+                <button
+
+                    type="button"
+
+                    id="filter-review-trigger"
+
+                    aria-expanded="false"
+
+                    aria-haspopup="listbox"
+
+                    class="flex w-full items-center justify-between gap-2 rounded-xl border border-border-light bg-white px-4 py-2.5 text-left text-sm text-text-main transition hover:border-primary/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+
+                >
+                    <span
+
+                        id="filter-review-label"
+
+                        class="truncate"
+
+                    >
+
+                        All Reviews
+
+                    </span>
+                    <i
+
+                        data-lucide="chevron-down"
+
+                        class="h-4 w-4 shrink-0 text-text-muted"
+
+                    ></i>
+                </button>
+                <!-- DROPDOWN -->
+
+                <div
+
+                    id="filter-review-dropdown"
+
+                    role="listbox"
+
+                    aria-label="Cost review filter"
+
+                    class="absolute left-0 right-0 top-full z-50 mt-2 hidden min-w-52 overflow-hidden rounded-xl border border-border-light bg-white py-1 shadow-xl"
+
+                >
+                    <!-- ALL REVIEWS -->
+
+                    <button
+
+                        type="button"
+
+                        role="option"
+
+                        class="filter-review-option flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value=""
+
+                        data-label="All Reviews"
+
+                    >
+                        <span>All Reviews</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- COST INCREASED -->
+
+                    <button
+
+                        type="button"
+
+                        role="option"
+
+                        class="filter-review-option flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="increased"
+
+                        data-label="Cost Increased"
+
+                    >
+                        <span>Cost Increased</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- COST DECREASED -->
+
+                    <button
+
+                        type="button"
+
+                        role="option"
+
+                        class="filter-review-option flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="decreased"
+
+                        data-label="Cost Decreased"
+
+                    >
+                        <span>Cost Decreased</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                    <!-- NO PENDING REVIEW -->
+
+                    <button
+
+                        type="button"
+
+                        role="option"
+
+                        class="filter-review-option flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm transition hover:bg-soft-green hover:text-primary"
+
+                        data-value="no_pending"
+
+                        data-label="No Pending Review"
+
+                    >
+                        <span>No Pending Review</span>
+                        <i
+
+                            data-lucide="check"
+
+                            class="option-check hidden h-4 w-4 shrink-0 text-primary"
+
+                        ></i>
+                    </button>
+                </div>
+            </div>
+            <!-- SEARCH BUTTON -->
+
+            <button
+
+                type="submit"
+
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+
+            >
+                <i
+
+                    data-lucide="search"
+
+                    class="h-4 w-4"
+
+                ></i>
+                Search
+            </button>
+            <!-- CLEAR FILTERS -->
+
+            {% if search_query or selected_category or selected_stock or selected_review %}
+            <a
+
+                href="{% url 'products:list' %}"
+
+                class="inline-flex items-center justify-center rounded-xl border border-border-light px-4 py-2.5 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+
+            >
+
+                Clear
+
+            </a>
+            {% endif %}
+        </form>
+    </div>
+    <!-- ==========================================
+
+         PRODUCTS TABLE
+
+    ========================================== -->
+
+    <div class="overflow-x-auto rounded-b-2xl">
+        <table class="w-full min-w-[1100px] text-left">
+            <thead class="bg-page-bg">
+                <tr class="text-xs font-semibold uppercase tracking-wide text-text-muted">
+                    <th class="px-5 py-4">
+
+                        Product
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Category
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Cost Price
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Selling Price
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Stock
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Stock Status
+
+                    </th>
+                    <th class="px-5 py-4">
+
+                        Cost Review
+
+                    </th>
+                    <th class="px-5 py-4 text-right">
+
+                        Actions
+
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border-light">
+                {% for product in page_obj %}
+                <tr class="transition hover:bg-page-bg">
+                    <!-- PRODUCT -->
+
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border-light bg-soft-green">
+                                {% if product.image %}
+                                <img
+
+                                    src="{{ product.image.url }}"
+
+                                    alt="{{ product.name }}"
+
+                                    class="h-full w-full object-cover"
+
+                                >
+                                {% else %}
+                                <i
+
+                                    data-lucide="package"
+
+                                    class="h-6 w-6 text-primary"
+
+                                ></i>
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="max-w-52 truncate text-sm font-semibold text-dark-green">
+
+                                    {{ product.name }}
+
+                                </p>
+                                <p class="mt-1 text-xs text-text-muted">
+
+                                    SKU: {{ product.sku }}
+
+                                </p>
+                            </div>
+                        </div>
+                    </td>
+                    <!-- CATEGORY -->
+
+                    <td class="px-5 py-4 text-sm text-text-muted">
+
+                        {{ product.category.name }}
+
+                    </td>
+                    <!-- COST PRICE -->
+
+                    <td class="whitespace-nowrap px-5 py-4">
+                        <!-- LATEST COST -->
+
+                        <p class="text-sm font-semibold text-dark-green">
+
+                            £{{ product.cost_price|floatformat:2 }}
+
+                        </p>
+                        <!-- PREVIOUS COST -->
+
+                        {% if product.previous_cost is not None %}
+                            <!-- INCREASED -->
+
+                            {% if product.cost_review_required and product.cost_change_type == "increased" %}
+                            <p class="mt-1 flex items-center gap-1 text-xs font-medium text-red-600">
+                                <span>
+
+                                    Was £{{ product.previous_cost|floatformat:2 }}
+
+                                </span>
+                                <i
+
+                                    data-lucide="arrow-up-right"
+
+                                    class="h-3.5 w-3.5"
+
+                                ></i>
+                            </p>
+                            <!-- DECREASED -->
+
+                            {% elif product.cost_review_required and product.cost_change_type == "decreased" %}
+                            <p class="mt-1 flex items-center gap-1 text-xs font-medium text-amber-700">
+                                <span>
+
+                                    Was £{{ product.previous_cost|floatformat:2 }}
+
+                                </span>
+                                <i
+
+                                    data-lucide="arrow-down-right"
+
+                                    class="h-3.5 w-3.5"
+
+                                ></i>
+                            </p>
+                            <!-- REVIEWED -->
+
+                            {% else %}
+                            <p class="mt-1 text-xs text-text-muted">
+
+                                Was £{{ product.previous_cost|floatformat:2 }}
+
+                            </p>
+                            {% endif %}
+                        {% endif %}
+                        <!-- WEIGHTED AVERAGE COST -->
+
+                        <p class="mt-1 text-xs font-medium text-primary">
+
+                            Avg £{{ product.average_cost|floatformat:2 }}
+
+                        </p>
+                    </td>
+                    <!-- SELLING PRICE -->
+
+                    <td class="whitespace-nowrap px-5 py-4 text-sm font-semibold text-dark-green">
+
+                        £{{ product.selling_price|floatformat:2 }}
+
+                    </td>
+                    <!-- STOCK -->
+
+                    <td class="px-5 py-4 text-sm font-semibold text-dark-green">
+
+                        {{ product.stock_quantity }}
+
+                    </td>
+                    <!-- STOCK STATUS -->
+
+                    <td class="px-5 py-4">
+                        {% if product.stock_quantity == 0 %}
+                        <span class="inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+
+                            Out of Stock
+
+                        </span>
+                        {% elif product.stock_quantity <= product.low_stock_threshold %}
+                        <span class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+
+                            Low Stock
+
+                        </span>
+                        {% else %}
+                        <span class="inline-flex rounded-full bg-soft-green px-3 py-1 text-xs font-semibold text-primary">
+
+                            In Stock
+
+                        </span>
+                        {% endif %}
+                    </td>
+                    <!-- ==========================================
+
+                         COST REVIEW STATUS
+
+                    ========================================== -->
+
+                    <td class="px-5 py-4">
+                        {% if product.cost_review_required %}
+                        <div class="flex flex-col items-start gap-2">
+                            <!-- COST INCREASED -->
+
+                            {% if product.cost_change_type == "increased" %}
+                            <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                                <i
+
+                                    data-lucide="trending-up"
+
+                                    class="h-3.5 w-3.5"
+
+                                ></i>
+                                Cost Increased
+                            </span>
+                            <!-- COST DECREASED -->
+
+                            {% elif product.cost_change_type == "decreased" %}
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                                <i
+
+                                    data-lucide="trending-down"
+
+                                    class="h-3.5 w-3.5"
+
+                                ></i>
+                                Cost Decreased
+                            </span>
+                            <!-- GENERAL REVIEW -->
+
+                            {% else %}
+                            <span class="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+
+                                Review Required
+
+                            </span>
+                            {% endif %}
+                            <!-- MARK AS REVIEWED -->
+
+                            {% if can_edit_product %}
+                            <form
+
+                                method="post"
+
+                                action="{% url 'products:mark_reviewed' product.pk %}"
+
+                            >
+                                {% csrf_token %}
+                                <button
+
+                                    type="submit"
+
+                                    class="inline-flex items-center gap-1 text-xs font-semibold text-primary transition hover:underline"
+
+                                >
+                                    <i
+
+                                        data-lucide="check-circle-2"
+
+                                        class="h-3.5 w-3.5"
+
+                                    ></i>
+                                    Mark as Reviewed
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="text-xs text-text-muted">Pending review</span>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <span class="text-xs text-text-muted">
+
+                            No pending review
+
+                        </span>
+                        {% endif %}
+                    </td>
+                    <!-- ==========================================
+
+                         ACTIONS
+
+                    ========================================== -->
+
+                    <td class="px-5 py-4">
+                        <div class="flex items-center justify-end gap-1">
+                            <!-- VIEW PRODUCT -->
+
+                            <button
+
+                                type="button"
+
+                                title="View Product"
+
+                                class="view-product rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                data-name="{{ product.name }}"
+
+                                data-sku="{{ product.sku }}"
+
+                                data-category="{{ product.category.name }}"
+
+                                data-description="{{ product.description }}"
+                                data-cost="{{ product.cost_price }}"
+
+                                data-previous-cost="{{ product.previous_cost|default_if_none:'' }}"
+
+                                data-average-cost="{{ product.average_cost }}"
+
+                                data-price="{{ product.selling_price }}"
+                                data-stock="{{ product.stock_quantity }}"
+
+                                data-alert="{{ product.low_stock_threshold }}"
+                                data-created="{{ product.created_at|date:'d M Y' }}"
+
+                                data-image="{% if product.image %}{{ product.image.url }}{% endif %}"
+
+                            >
+                                <i
+
+                                    data-lucide="eye"
+
+                                    class="h-4 w-4"
+
+                                ></i>
+                            </button>
+                            <!-- EDIT PRODUCT -->
+                            {% if can_edit_product %}
+
+                            <button
+
+                                type="button"
+
+                                title="Edit Product"
+
+                                class="edit-product rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                data-url="{% url 'products:edit' product.pk %}"
+                                data-name="{{ product.name }}"
+
+                                data-sku="{{ product.sku }}"
+
+                                data-category-id="{{ product.category_id }}"
+
+                                data-description="{{ product.description }}"
+                                data-cost="{{ product.cost_price }}"
+
+                                data-price="{{ product.selling_price }}"
+                                data-stock="{{ product.stock_quantity }}"
+
+                                data-alert="{{ product.low_stock_threshold }}"
+                                data-image="{% if product.image %}{{ product.image.url }}{% endif %}"
+
+                            >
+                                <i
+
+                                    data-lucide="pencil"
+
+                                    class="h-4 w-4"
+
+                                ></i>
+                            </button>
+                                                        {% endif %}
+<!-- DELETE PRODUCT -->
+                            {% if can_delete_product %}
+
+                            <button
+
+                                type="button"
+
+                                title="Delete Product"
+
+                                class="delete-product rounded-lg p-2 text-red-500 transition hover:bg-red-50"
+                                data-name="{{ product.name }}"
+
+                                data-url="{% url 'products:delete' product.pk %}"
+
+                            >
+                                <i
+
+                                    data-lucide="trash-2"
+
+                                    class="h-4 w-4"
+
+                                ></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- ==========================================
+
+                     EMPTY STATE
+
+                ========================================== -->
+
+                <tr>
+                    <td colspan="8" class="px-6 py-16 text-center">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-soft-green">
+                            <i
+
+                                data-lucide="package-open"
+
+                                class="h-8 w-8 text-primary"
+
+                            ></i>
+                        </div>
+                        <h3 class="mt-4 text-base font-semibold text-dark-green">
+
+                            No Products Found
+
+                        </h3>
+                        <p class="mt-2 text-sm text-text-muted">
+                            {% if search_query or selected_category or selected_stock or selected_review %}
+                                No products match your search or filters.
+                            {% else %}
+                                You haven't added any products yet.
+                            {% endif %}
+                        </p>
+                        {% if can_add_product and not search_query and not selected_category and not selected_stock and not selected_review %}
+                        <button
+
+                            type="button"
+
+                            id="empty-add-product"
+
+                            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+
+                        >
+                            <i
+
+                                data-lucide="plus"
+
+                                class="h-4 w-4"
+
+                            ></i>
+                            Add First Product
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- ==========================================
+
+         PAGINATION
+
+    ========================================== -->
+
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex flex-col gap-3 border-t border-border-light px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-text-muted">
+            Showing {{ page_obj.start_index }}
+
+            to {{ page_obj.end_index }}
+
+            of {{ page_obj.paginator.count }} products
+        </p>
+        <div class="flex items-center gap-2">
+            <!-- PREVIOUS PAGE -->
+
+            {% if page_obj.has_previous %}
+            <a
+
+                href="?q={{ search_query|urlencode }}&category={{ selected_category|urlencode }}&stock={{ selected_stock|urlencode }}&review={{ selected_review|urlencode }}&page={{ page_obj.previous_page_number }}"
+
+                class="rounded-lg border border-border-light px-4 py-2 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+
+            >
+
+                Previous
+
+            </a>
+            {% endif %}
+            <!-- CURRENT PAGE -->
+
+            <span class="rounded-lg bg-soft-green px-4 py-2 text-sm font-semibold text-primary">
+                {{ page_obj.number }}
+
+                /
+
+                {{ page_obj.paginator.num_pages }}
+            </span>
+            <!-- NEXT PAGE -->
+
+            {% if page_obj.has_next %}
+            <a
+
+                href="?q={{ search_query|urlencode }}&category={{ selected_category|urlencode }}&stock={{ selected_stock|urlencode }}&review={{ selected_review|urlencode }}&page={{ page_obj.next_page_number }}"
+
+                class="rounded-lg border border-border-light px-4 py-2 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+
+            >
+
+                Next
+
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>

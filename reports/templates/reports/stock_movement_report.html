@@ -1,0 +1,168 @@
+
+{% extends "reports/base_reports.html" %}
+
+{% block report_content %}
+
+<div class="mb-6">
+    <h2 class="text-xl font-bold text-dark-green">
+        Stock Movement Report
+    </h2>
+
+    <p class="mt-1 text-sm text-text-muted">
+        Track stock received, sold, returned and adjusted.
+    </p>
+</div>
+
+<!-- SUMMARY -->
+<div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Stock In</p>
+        <p class="mt-3 text-3xl font-bold text-primary">
+            +{{ stock_in }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Stock Out</p>
+        <p class="mt-3 text-3xl font-bold text-red-600">
+            -{{ stock_out }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Net Stock Change</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            {{ net_change }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Total Movements</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            {{ movement_count }}
+        </p>
+    </div>
+
+</div>
+
+<!-- PRODUCT MOVEMENT -->
+<section class="mb-7 overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Product Movement Summary
+        </h3>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[650px] text-left text-sm">
+
+            <thead class="bg-gray-50 text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Product</th>
+                    <th class="px-5 py-4">SKU</th>
+                    <th class="px-5 py-4 text-right">Movements</th>
+                    <th class="px-5 py-4 text-right">Net Change</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+
+                {% for row in product_rows %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-5 py-4 font-semibold text-dark-green">
+                        {{ row.product__name }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ row.product__sku }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right">
+                        {{ row.movement_count }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right font-semibold text-primary">
+                        {{ row.net_change }}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="4"
+                        class="px-5 py-10 text-center text-text-muted">
+                        No stock movements found.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- MOVEMENT HISTORY -->
+<section class="overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Recent Stock Movements
+        </h3>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[750px] text-left text-sm">
+
+            <thead class="bg-gray-50 text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Product</th>
+                    <th class="px-5 py-4">Movement Type</th>
+                    <th class="px-5 py-4 text-right">Quantity Change</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+
+                {% for movement in recent_movements %}
+                <tr class="hover:bg-gray-50">
+
+                    <td class="px-5 py-4 text-text-muted">
+                        {{ movement.created_at|date:"d M Y H:i" }}
+                    </td>
+
+                    <td class="px-5 py-4 font-semibold text-dark-green">
+                        {{ movement.product.name }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ movement.get_movement_type_display }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right font-semibold
+                        {% if movement.quantity_change > 0 %}
+                            text-primary
+                        {% else %}
+                            text-red-600
+                        {% endif %}">
+                        {{ movement.quantity_change }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="4"
+                        class="px-5 py-12 text-center text-text-muted">
+                        No stock movements recorded.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

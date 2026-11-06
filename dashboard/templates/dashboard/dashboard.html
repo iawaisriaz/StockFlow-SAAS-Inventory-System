@@ -1,0 +1,642 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+<!-- ================= CSS ================= -->
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+
+{% endblock %}
+
+
+<!-- ================= CONTENT ================= -->
+{% block content %}
+
+<!-- ================= SIDEBAR ================= -->
+{% include "partials/navbar.html" %}
+
+
+<!-- ================= DASHBOARD LAYOUT ================= -->
+<div
+    id="app-layout"
+    class="min-h-screen bg-gray-50 lg:ml-64"
+>
+
+    <!-- ================= HEADER ================= -->
+    {% include "partials/header.html" %}
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
+
+
+        <!-- ==========================================
+             PAGE HEADER
+        =========================================== -->
+        <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+
+            <div>
+
+                <h1 class="text-2xl font-bold tracking-tight text-[var(--color-forest)] sm:text-3xl">
+                    Dashboard
+                </h1>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    Welcome back, {{ request.user.username }}!
+                    Here's your business overview.
+                </p>
+
+            </div>
+
+            <!-- CURRENT DATE -->
+            <div class="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5">
+
+                <i
+                    data-lucide="calendar-days"
+                    class="h-4 w-4 text-emerald-700"
+                ></i>
+
+                <span class="text-sm font-medium text-[var(--color-forest)]">
+                    {% now "d M Y" %}
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             TODAY'S FINANCIAL OVERVIEW
+        =========================================== -->
+        <section class="mb-7">
+
+            <!-- SECTION TITLE -->
+            <div class="mb-4 flex items-center justify-between gap-3">
+
+                <h2 class="text-lg font-bold text-[var(--color-forest)]">
+                    Today's Overview
+                </h2>
+
+                <span class="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
+                    Today
+                </span>
+
+            </div>
+
+
+            <!-- FINANCIAL CARDS -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+
+                <!-- ================= GROSS SALES ================= -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-center justify-between gap-3">
+
+                        <p class="text-sm font-medium text-gray-500">
+                            Gross Sales
+                        </p>
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+
+                            <i
+                                data-lucide="shopping-bag"
+                                class="h-5 w-5 text-emerald-700"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-3xl font-bold tracking-tight text-[var(--color-forest)]">
+                        £{{ sales_summary.gross_sales|default:0|floatformat:2 }}
+                    </p>
+
+                    <p class="mt-2 text-xs text-gray-500">
+                        Completed sales before refunds
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================= REFUNDS ================= -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-center justify-between gap-3">
+
+                        <p class="text-sm font-medium text-gray-500">
+                            Refunds
+                        </p>
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50">
+
+                            <i
+                                data-lucide="rotate-ccw"
+                                class="h-5 w-5 text-red-600"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-3xl font-bold tracking-tight text-red-600">
+                        £{{ sales_summary.refunds|default:0|floatformat:2 }}
+                    </p>
+
+                    <p class="mt-2 text-xs text-gray-500">
+                        Refunds recorded today
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================= NET SALES ================= -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-center justify-between gap-3">
+
+                        <p class="text-sm font-medium text-gray-500">
+                            Net Sales
+                        </p>
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+
+                            <i
+                                data-lucide="wallet"
+                                class="h-5 w-5 text-emerald-700"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-3xl font-bold tracking-tight text-[var(--color-forest)]">
+                        £{{ sales_summary.net_sales|default:0|floatformat:2 }}
+                    </p>
+
+                    <p class="mt-2 text-xs text-gray-500">
+                        Gross sales minus refunds
+                    </p>
+
+                </div>
+
+
+
+                <!-- ================= GROSS PROFIT ================= -->
+                <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+
+                    <div class="flex items-center justify-between gap-3">
+
+                        <p class="text-sm font-medium text-gray-500">
+                            Gross Profit
+                        </p>
+
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+
+                            <i
+                                data-lucide="trending-up"
+                                class="h-5 w-5 text-emerald-700"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+                    <p class="mt-4 text-3xl font-bold tracking-tight text-[var(--color-forest)]">
+                        £{{ profit_summary.gross_profit|default:0|floatformat:2 }}
+                    </p>
+
+                    <p class="mt-2 text-xs text-gray-500">
+                        Net sales minus net product cost
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==========================================
+             SALES CHART + INVENTORY OVERVIEW
+        =========================================== -->
+        <section class="mb-7 grid grid-cols-1 items-stretch gap-5 xl:grid-cols-5">
+
+
+            <!-- ======================================
+                 LEFT: SALES & REFUNDS TREND
+            ======================================= -->
+            <div class="min-w-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-3">
+
+                <!-- CHART HEADER -->
+                <div class="mb-5 flex flex-wrap items-start justify-between gap-3">
+
+                    <div>
+
+                        <h2 class="text-lg font-bold text-[var(--color-forest)]">
+                            Sales & Refunds Trend
+                        </h2>
+
+                        <p class="mt-1 text-sm text-gray-500">
+                            Daily sales and refunds over the last 7 days.
+                        </p>
+
+                    </div>
+
+                    <span class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600">
+                        Last 7 Days
+                    </span>
+
+                </div>
+
+
+                <!-- SVG CHART -->
+                <div
+                    id="reports-weekly-chart"
+                    class="h-64 w-full sm:h-72"
+                ></div>
+
+                <!-- CHART DATA -->
+                {{ weekly_chart|json_script:"reports-chart-data" }}
+
+            </div>
+
+
+
+            <!-- ======================================
+                 RIGHT: INVENTORY OVERVIEW
+            ======================================= -->
+            <div class="min-w-0 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6 xl:col-span-2">
+
+
+                <!-- INVENTORY HEADER -->
+                <div class="mb-5">
+
+                    <h2 class="text-lg font-bold text-[var(--color-forest)]">
+                        Inventory Overview
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Current inventory status.
+                    </p>
+
+                </div>
+
+
+                <!-- INVENTORY GRID -->
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-2">
+
+
+                    <!-- TOTAL PRODUCTS -->
+                    <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
+
+                        <div class="flex items-center justify-between gap-2">
+
+                            <p class="text-xs font-medium text-gray-500">
+                                Total Products
+                            </p>
+
+                            <i
+                                data-lucide="package"
+                                class="h-4 w-4 text-emerald-700"
+                            ></i>
+
+                        </div>
+
+                        <p class="mt-3 text-2xl font-bold text-[var(--color-forest)]">
+                            {{ inventory_summary.total_products|default:0 }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- INVENTORY VALUE -->
+                    <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
+
+                        <div class="flex items-center justify-between gap-2">
+
+                            <p class="text-xs font-medium text-gray-500">
+                                Inventory Value
+                            </p>
+
+                            <i
+                                data-lucide="boxes"
+                                class="h-4 w-4 text-emerald-700"
+                            ></i>
+
+                        </div>
+
+                        <p class="mt-3 break-words text-2xl font-bold text-[var(--color-forest)]">
+                            £{{ inventory_summary.inventory_value|default:0|floatformat:2 }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- LOW STOCK -->
+                    <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-4">
+
+                        <div class="flex items-center justify-between gap-2">
+
+                            <p class="text-xs font-medium text-gray-500">
+                                Low Stock
+                            </p>
+
+                            <i
+                                data-lucide="alert-triangle"
+                                class="h-4 w-4 text-amber-600"
+                            ></i>
+
+                        </div>
+
+                        <p class="mt-3 text-2xl font-bold text-amber-600">
+                            {{ inventory_summary.low_stock_count|default:0 }}
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- OUT OF STOCK -->
+                    <div class="rounded-xl border border-red-100 bg-red-50/50 p-4">
+
+                        <div class="flex items-center justify-between gap-2">
+
+                            <p class="text-xs font-medium text-gray-500">
+                                Out of Stock
+                            </p>
+
+                            <i
+                                data-lucide="package-x"
+                                class="h-4 w-4 text-red-600"
+                            ></i>
+
+                        </div>
+
+                        <p class="mt-3 text-2xl font-bold text-red-600">
+                            {{ inventory_summary.out_of_stock_count|default:0 }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INVENTORY FOOTER -->
+                <p class="mt-4 text-xs text-gray-500">
+                    Inventory values reflect your current stock.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==========================================
+             RECENT SALES
+        =========================================== -->
+        <section class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+
+            <!-- SECTION HEADER -->
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 p-5 sm:px-6">
+
+                <div>
+
+                    <h2 class="text-lg font-bold text-[var(--color-forest)]">
+                        Recent Sales
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Your latest 3 completed transactions.
+                    </p>
+
+                </div>
+
+
+                <!-- VIEW ALL -->
+                <a
+                    href="{% url 'sales:list' %}"
+                    class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 transition hover:text-emerald-900"
+                >
+
+                    View All
+
+                    <i
+                        data-lucide="arrow-right"
+                        class="h-4 w-4"
+                    ></i>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- SALES TABLE -->
+            <div class="overflow-x-auto">
+
+                <table class="w-full min-w-[760px] text-left text-sm">
+
+
+                    <!-- TABLE HEAD -->
+                    <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+
+                        <tr>
+
+                            <th class="px-5 py-4 font-semibold sm:pl-6">
+                                Sale
+                            </th>
+
+                            <th class="px-5 py-4 font-semibold">
+                                Customer
+                            </th>
+
+                            <th class="px-5 py-4 font-semibold">
+                                Products
+                            </th>
+
+                            <th class="px-5 py-4 font-semibold">
+                                Date
+                            </th>
+
+                            <th class="px-5 py-4 text-right font-semibold">
+                                Amount
+                            </th>
+
+                            <th class="px-5 py-4 text-right font-semibold sm:pr-6">
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+
+                    <!-- TABLE BODY -->
+                    <tbody class="divide-y divide-gray-100">
+
+                        {% for sale in recent_sales %}
+
+                        <tr class="transition hover:bg-gray-50">
+
+
+                            <!-- SALE REFERENCE -->
+                            <td class="px-5 py-4 font-semibold text-[var(--color-forest)] sm:pl-6">
+                                {{ sale.reference }}
+                            </td>
+
+
+
+                            <!-- CUSTOMER -->
+                            <td class="px-5 py-4 text-gray-700">
+                                {{ sale.customer_name|default:"Walk-in Customer" }}
+                            </td>
+
+
+
+                            <!-- PRODUCTS -->
+                            <td class="px-5 py-4">
+
+                                <div class="max-w-[260px] space-y-1">
+
+                                    {% for item in sale.items.all %}
+
+                                    <p
+                                        class="truncate text-xs text-gray-600"
+                                        title="{{ item.product_name }}"
+                                    >
+
+                                        {{ item.product_name }}
+
+                                        <span class="text-gray-400">
+                                            × {{ item.quantity }}
+                                        </span>
+
+                                    </p>
+
+                                    {% empty %}
+
+                                    <span class="text-xs text-gray-400">
+                                        No items
+                                    </span>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- DATE -->
+                            <td class="px-5 py-4 text-gray-600">
+
+                                <p>
+                                    {{ sale.sale_date|date:"d M Y" }}
+                                </p>
+
+                                <p class="mt-1 text-xs text-gray-400">
+                                    {{ sale.sale_date|date:"h:i A" }}
+                                </p>
+
+                            </td>
+
+
+
+                            <!-- AMOUNT -->
+                            <td class="px-5 py-4 text-right font-bold text-[var(--color-forest)]">
+                                £{{ sale.total|floatformat:2 }}
+                            </td>
+
+
+
+                            <!-- VIEW ACTION -->
+                            <td class="px-5 py-4 text-right sm:pr-6">
+
+                                <a
+                                    href="{% url 'sales:detail' sale.pk %}"
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-50"
+                                >
+
+                                    View
+
+                                    <i
+                                        data-lucide="arrow-up-right"
+                                        class="h-3.5 w-3.5"
+                                    ></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="px-5 py-12 text-center"
+                            >
+
+                                <div class="flex flex-col items-center gap-3">
+
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+
+                                        <i
+                                            data-lucide="receipt-text"
+                                            class="h-6 w-6 text-gray-400"
+                                        ></i>
+
+                                    </div>
+
+                                    <p class="text-sm font-medium text-gray-500">
+                                        No completed sales yet.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+
+<!-- ================= JAVASCRIPT ================= -->
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+
+<!-- Existing Reports Chart JavaScript -->
+<script src="{% static 'js/reports.js' %}" defer></script>
+
+{% endblock %}

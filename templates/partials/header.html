@@ -1,0 +1,125 @@
+
+{% load static %}
+
+<!-- ================= STOCKFLOW HEADER ================= -->
+
+<header
+    id="stockflow-header"
+    class="sticky top-0 z-30 flex h-[72px] items-center justify-between gap-4 border-b border-[var(--color-border)] bg-white px-4 sm:px-6"
+>
+
+    <!-- ================= LEFT SECTION ================= -->
+
+    <div class="flex min-w-0 items-center gap-3">
+
+        <!-- Sidebar Toggle -->
+        <button
+            type="button"
+            id="sidebar-toggle"
+            aria-label="Toggle sidebar"
+            aria-controls="stockflow-sidebar"
+            aria-expanded="false"
+            title="Toggle sidebar"
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[var(--color-forest)] transition hover:bg-[var(--color-mint)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+        >
+            <i
+                data-lucide="panel-left"
+                class="h-5 w-5"
+            ></i>
+        </button>
+
+        <!-- Header Brand -->
+        <div class="min-w-0">
+
+            <p class="truncate text-sm font-bold text-[var(--color-forest)] sm:text-base">
+                StockFlow
+            </p>
+
+            <p class="hidden text-xs text-[var(--color-muted)] sm:block">
+                Inventory Management
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= RIGHT SECTION ================= -->
+
+    <div class="flex shrink-0 items-center gap-3">
+
+        <!-- User Information -->
+        <div class="hidden min-w-0 text-right sm:block">
+
+            <!-- Full Name / Username -->
+            <p class="max-w-44 truncate text-sm font-bold text-[var(--color-ink)]">
+
+                {% if request.user.first_name or request.user.last_name %}
+
+                    {{ request.user.get_full_name|default:request.user.username }}
+
+                {% else %}
+
+                    {{ request.user.username }}
+
+                {% endif %}
+
+            </p>
+
+            <!-- Account Role -->
+             
+            <p class="mt-0.5 text-xs font-medium text-[var(--color-muted)]">
+
+                {% for membership in request.user.business_memberships.all %}
+
+                    {% if membership.is_active %}
+
+                        {% if membership.role == "OWNER" %}
+                            Owner
+                        {% elif membership.role == "EMPLOYEE" %}
+                            Staff
+                        {% endif %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </p>
+
+        </div>
+
+
+        <!-- ================= PROFILE AVATAR ================= -->
+
+        <div
+            class="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-[var(--color-primary)]"
+            title="{{ request.user.username }}"
+        >
+
+            {% if request.user.profile_photo %}
+
+                <!-- Uploaded Profile Image -->
+                <img
+                    src="{{ request.user.profile_photo.url }}"
+                    alt="{{ request.user.username }} profile photo"
+                    class="block h-full w-full rounded-full object-cover object-center"
+                    width="40"
+                    height="40"
+                >
+
+            {% else %}
+
+                <!-- Default Username Avatar -->
+                <div
+                    class="flex h-full w-full items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-bold text-white"
+                >
+                    {{ request.user.username|first|upper }}
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</header>

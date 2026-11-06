@@ -1,0 +1,218 @@
+{% extends "reports/base_reports.html" %}
+
+{% block report_content %}
+
+<div class="mb-6">
+    <h2 class="text-xl font-bold text-dark-green">Sales Report</h2>
+    <p class="mt-1 text-sm text-text-muted">
+        Sales, refunds and net revenue for the selected period.
+    </p>
+</div>
+
+<!-- CARDS -->
+<div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Gross Sales</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            £{{ summary.gross_sales|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Total Refunds</p>
+        <p class="mt-3 text-3xl font-bold text-red-600">
+            £{{ summary.refunds|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Net Sales</p>
+        <p class="mt-3 text-3xl font-bold text-primary">
+            £{{ summary.net_sales|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Completed Transactions</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            {{ summary.sales_count }}
+        </p>
+    </div>
+
+</div>
+
+<!-- DAILY BREAKDOWN -->
+<section class="mb-7 overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Daily Sales Breakdown
+        </h3>
+        <p class="mt-1 text-xs text-text-muted">
+            Refunds are grouped by return date, not original sale date.
+        </p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[700px] text-left text-sm">
+
+            <thead class="bg-gray-50 text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Sales</th>
+                    <th class="px-5 py-4 text-right">Gross Sales</th>
+                    <th class="px-5 py-4 text-right">Refunds</th>
+                    <th class="px-5 py-4 text-right">Net Sales</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+
+                {% for row in daily_rows %}
+                <tr class="hover:bg-gray-50">
+
+                    <td class="px-5 py-4 font-medium text-dark-green">
+                        {{ row.day|date:"d M Y" }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ row.sales_count }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right">
+                        £{{ row.gross|floatformat:2 }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right text-red-600">
+                        £{{ row.refunds|floatformat:2 }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right font-semibold text-primary">
+                        £{{ row.net|floatformat:2 }}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-5 py-12 text-center text-text-muted">
+                        No sales or refunds found for this period.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- RECENT SALES -->
+<section class="mb-7 overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Recent Completed Sales
+        </h3>
+        <p class="mt-1 text-xs text-text-muted">
+            Latest 50 transactions in the selected period.
+        </p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[650px] text-sm">
+
+            <thead class="bg-gray-50 text-left text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Reference</th>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Customer</th>
+                    <th class="px-5 py-4">Payment</th>
+                    <th class="px-5 py-4 text-right">Total</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+                {% for sale in recent_sales %}
+                <tr>
+                    <td class="px-5 py-4 font-semibold text-dark-green">
+                        {{ sale.reference }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ sale.sale_date|date:"d M Y, H:i" }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ sale.customer_name|default:"Walk-in Customer" }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ sale.get_payment_method_display }}
+                    </td>
+                    <td class="px-5 py-4 text-right font-semibold">
+                        £{{ sale.total|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-5 py-10 text-center text-text-muted">
+                        No completed sales found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- RECENT RETURNS -->
+<section class="overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Recent Refunds
+        </h3>
+        <p class="mt-1 text-xs text-text-muted">
+            Latest 50 active returns in the selected period.
+        </p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[550px] text-sm">
+
+            <thead class="bg-gray-50 text-left text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Return Reference</th>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Reason</th>
+                    <th class="px-5 py-4 text-right">Refund</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+                {% for item in recent_returns %}
+                <tr>
+                    <td class="px-5 py-4 font-semibold text-dark-green">
+                        {{ item.reference }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ item.created_at|date:"d M Y, H:i" }}
+                    </td>
+                    <td class="px-5 py-4">
+                        {{ item.get_reason_display }}
+                    </td>
+                    <td class="px-5 py-4 text-right font-semibold text-red-600">
+                        £{{ item.refund_amount|floatformat:2 }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-5 py-10 text-center text-text-muted">
+                        No refunds found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+{% endblock %}

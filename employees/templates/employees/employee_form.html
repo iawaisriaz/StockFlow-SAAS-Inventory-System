@@ -1,0 +1,355 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if is_edit %}Edit Employee{% else %}Add Employee{% endif %} | StockFlow
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ================= SIDEBAR ================= -->
+{% include "partials/navbar.html" %}
+
+<!-- ================= APP LAYOUT ================= -->
+<div id="app-layout" class="min-h-screen bg-gray-50 lg:ml-64">
+
+    <!-- HEADER -->
+    {% include "partials/header.html" %}
+
+    <!-- MAIN CONTENT -->
+    <main class="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
+
+        <div class="mx-auto max-w-5xl">
+
+            <!-- ================= PAGE TITLE ================= -->
+            <div class="mb-7">
+
+                <h1 class="text-2xl font-bold tracking-tight text-[var(--color-forest)] sm:text-3xl">
+                    {% if is_edit %}
+                        Edit Employee
+                    {% else %}
+                        Add Employee
+                    {% endif %}
+                </h1>
+
+                <p class="mt-1 text-sm text-gray-500">
+                    {% if is_edit %}
+                        Update employee account information.
+                    {% else %}
+                        Create an employee account. Permissions can be assigned later.
+                    {% endif %}
+                </p>
+
+            </div>
+
+            <!-- ================= EMPLOYEE FORM ================= -->
+            <form method="post"
+                  class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+                {% csrf_token %}
+
+                <!-- FORM HEADER -->
+                <div class="border-b border-gray-100 p-5 sm:px-7 sm:py-6">
+
+                    <h2 class="text-lg font-bold text-[var(--color-forest)]">
+                        Employee Information
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Enter the employee's account details.
+                    </p>
+
+                </div>
+
+                <!-- FORM BODY -->
+                <div class="p-5 sm:p-7">
+
+                    <!-- NON FIELD ERRORS -->
+                    {% if form.non_field_errors %}
+                        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- ================= ORDERED FORM FIELDS ================= -->
+                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                        <!-- FIRST NAME -->
+                        {% with field=form.first_name %}
+                        <div>
+                            <label for="{{ field.id_for_label }}"
+                                   class="mb-2 block text-sm font-semibold text-gray-800">
+                                First Name
+                            </label>
+
+                            <input type="text"
+                                   id="{{ field.id_for_label }}"
+                                   name="{{ field.html_name }}"
+                                   value="{{ field.value|default_if_none:'' }}"
+                                   autocomplete="given-name"
+                                   {% if field.field.required %}required{% endif %}
+                                   class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                            {% for error in field.errors %}
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        {% endwith %}
+
+                        <!-- LAST NAME -->
+                        {% with field=form.last_name %}
+                        <div>
+                            <label for="{{ field.id_for_label }}"
+                                   class="mb-2 block text-sm font-semibold text-gray-800">
+                                Last Name
+                            </label>
+
+                            <input type="text"
+                                   id="{{ field.id_for_label }}"
+                                   name="{{ field.html_name }}"
+                                   value="{{ field.value|default_if_none:'' }}"
+                                   autocomplete="family-name"
+                                   {% if field.field.required %}required{% endif %}
+                                   class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                            {% for error in field.errors %}
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        {% endwith %}
+
+                        <!-- USERNAME -->
+                        {% with field=form.username %}
+                        <div>
+                            <label for="{{ field.id_for_label }}"
+                                   class="mb-2 block text-sm font-semibold text-gray-800">
+                                Username
+                            </label>
+
+                            <input type="text"
+                                   id="{{ field.id_for_label }}"
+                                   name="{{ field.html_name }}"
+                                   value="{{ field.value|default_if_none:'' }}"
+                                   autocomplete="username"
+                                   {% if field.field.required %}required{% endif %}
+                                   class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                            {% for error in field.errors %}
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        {% endwith %}
+
+                        <!-- EMAIL -->
+                        {% with field=form.email %}
+                        <div>
+                            <label for="{{ field.id_for_label }}"
+                                   class="mb-2 block text-sm font-semibold text-gray-800">
+                                Email
+                            </label>
+
+                            <input type="email"
+                                   id="{{ field.id_for_label }}"
+                                   name="{{ field.html_name }}"
+                                   value="{{ field.value|default_if_none:'' }}"
+                                   autocomplete="email"
+                                   {% if field.field.required %}required{% endif %}
+                                   class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                            {% for error in field.errors %}
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                        {% endwith %}
+
+                        <!-- ================= PASSWORD FIELDS ================= -->
+
+                        {% if is_edit %}
+
+                            <!-- NEW PASSWORD -->
+                            {% with field=form.new_password %}
+                            <div>
+                                <label for="{{ field.id_for_label }}"
+                                       class="mb-2 block text-sm font-semibold text-gray-800">
+                                    New Password
+                                </label>
+
+                                <input type="password"
+                                       id="{{ field.id_for_label }}"
+                                       name="{{ field.html_name }}"
+                                       autocomplete="new-password"
+                                       {% if field.field.required %}required{% endif %}
+                                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                                {% for error in field.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+
+                            <!-- CONFIRM NEW PASSWORD -->
+                            {% with field=form.confirm_new_password %}
+                            <div>
+                                <label for="{{ field.id_for_label }}"
+                                       class="mb-2 block text-sm font-semibold text-gray-800">
+                                    Confirm New Password
+                                </label>
+
+                                <input type="password"
+                                       id="{{ field.id_for_label }}"
+                                       name="{{ field.html_name }}"
+                                       autocomplete="new-password"
+                                       {% if field.field.required %}required{% endif %}
+                                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                                {% for error in field.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+
+                            <!-- PASSWORD NOTE -->
+                            <div class="sm:col-span-2">
+                                <p class="text-xs text-gray-500">
+                                    Leave both password fields blank to keep the current password.
+                                    The previous password is not required.
+                                </p>
+                            </div>
+
+                        {% else %}
+
+                            <!-- CREATE PASSWORD -->
+                            {% with field=form.password %}
+                            <div>
+                                <label for="{{ field.id_for_label }}"
+                                       class="mb-2 block text-sm font-semibold text-gray-800">
+                                    Password
+                                </label>
+
+                                <input type="password"
+                                       id="{{ field.id_for_label }}"
+                                       name="{{ field.html_name }}"
+                                       autocomplete="new-password"
+                                       {% if field.field.required %}required{% endif %}
+                                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                                {% for error in field.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+
+                            <!-- CONFIRM PASSWORD -->
+                            {% with field=form.confirm_password %}
+                            <div>
+                                <label for="{{ field.id_for_label }}"
+                                       class="mb-2 block text-sm font-semibold text-gray-800">
+                                    Confirm Password
+                                </label>
+
+                                <input type="password"
+                                       id="{{ field.id_for_label }}"
+                                       name="{{ field.html_name }}"
+                                       autocomplete="new-password"
+                                       {% if field.field.required %}required{% endif %}
+                                       class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100">
+
+                                {% for error in field.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+
+                        {% endif %}
+
+                        <!-- ================= ACTIVE EMPLOYEE ================= -->
+                        {% if form.is_active %}
+
+                            {% with field=form.is_active %}
+                            <div class="border-t border-gray-100 pt-5 sm:col-span-2">
+
+                                <label class="flex items-center gap-3 text-sm font-semibold text-gray-800">
+                                    {{ field }}
+                                    Active Employee
+                                </label>
+
+                                <p class="mt-2 text-xs text-gray-500">
+                                    Inactive employees cannot log in.
+                                </p>
+
+                                {% for error in field.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                {% endfor %}
+
+                            </div>
+                            {% endwith %}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- ================= FORM ACTIONS ================= -->
+                <div class="flex flex-wrap justify-end gap-3 border-t border-gray-100 px-5 py-5 sm:px-7">
+
+                    <!-- CANCEL -->
+                    <a href="{% url 'employees:list' %}"
+                       class="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </a>
+
+                    <!-- SUBMIT -->
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white hover:opacity-90">
+
+                        <i data-lucide="save" class="h-4 w-4"></i>
+
+                        {% if is_edit %}
+                            Save Changes
+                        {% else %}
+                            Create Account
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+{% endblock %}

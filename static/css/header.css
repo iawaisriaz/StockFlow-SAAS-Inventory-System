@@ -1,0 +1,37 @@
+/* ================= STOCKFLOW HEADER ================= */
+
+#stockflow-header {
+    background-color: #FFFFFF;
+    border-color: var(--color-border);
+}
+
+/* Search Input */
+#global-search:focus {
+    border-color: var(--color-primary);
+}
+
+/* Dropdown Animation */
+#notification-panel:not(.hidden),
+#profile-menu:not(.hidden) {
+    animation: headerDropdown 0.2s ease-out;
+}
+
+@keyframes headerDropdown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    #notification-panel,
+    #profile-menu {
+        animation: none !important;
+    }
+}

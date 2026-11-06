@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "partials/navbar.html" %}
+
+<div 
+    id="app-layout"
+    class="min-h-screen bg-page-bg lg:ml-64">
+
+    {% include "partials/header.html" %}
+
+    <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+                <div class="mb-2 flex items-center gap-2 text-sm text-text-muted">
+                    <span>Inventory</span>
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                    <span class="font-medium text-dark-green">Suppliers</span>
+                </div>
+
+                <h1 class="text-2xl font-bold text-dark-green sm:text-3xl">
+                    Suppliers
+                </h1>
+
+                <p class="mt-2 text-sm text-text-muted">
+                    Manage your suppliers and their contact details.
+                </p>
+            </div>
+
+            {% if can_add_supplier %}
+            <button
+                type="button"
+                id="open-add-supplier"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add Supplier
+            </button>
+            {% endif %}
+
+        </div>
+
+        <!-- SUPPLIERS TABLE -->
+        {% include "suppliers/partials/_supplier_table.html" %}
+
+    </main>
+
+</div>
+
+<!-- MODALS -->
+{% if can_add_supplier or can_edit_supplier %}
+{% include "suppliers/partials/_supplier_form_modal.html" %}
+{% endif %}
+{% include "suppliers/partials/_supplier_view_modal.html" %}
+{% if can_delete_supplier %}
+{% include "suppliers/partials/_supplier_delete_modal.html" %}
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+
+<script src="{% static 'js/suppliers.js' %}" defer></script>
+{% endblock %}

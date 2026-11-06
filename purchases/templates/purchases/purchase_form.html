@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+
+<div id="app-layout" class="min-h-screen bg-page-bg lg:ml-64">
+
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-7">
+            <h1 class="text-3xl font-bold text-dark-green">
+                {{ page_title }}
+            </h1>
+
+            <p class="mt-1 text-sm text-text-muted">
+                Select a supplier and purchase products linked to that supplier.
+            </p>
+        </div>
+
+        <!-- PURCHASE FORM -->
+        <form id="purchase-form" method="post" novalidate>
+
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            <!-- FORM ERRORS -->
+            {% if form.non_field_errors or formset.non_form_errors %}
+            <div class="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                {{ form.non_field_errors }}
+                {{ formset.non_form_errors }}
+            </div>
+            {% endif %}
+
+            <!-- ==========================================
+                 PURCHASE INFORMATION
+            =========================================== -->
+            <section class="mb-6 rounded-2xl border border-border-light bg-white p-6 shadow-sm">
+
+                <div class="mb-6 flex items-center gap-3">
+
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+                        <i data-lucide="clipboard-list" class="h-6 w-6"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="text-lg font-bold text-dark-green">
+                            Purchase Information
+                        </h2>
+
+                        <p class="text-sm text-text-muted">
+                            Supplier and purchase details
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                    <!-- SUPPLIER -->
+                    <div>
+
+                        <label class="mb-2 block text-sm font-semibold text-dark-green">
+                            Supplier
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <div
+                            id="purchase-supplier-dropdown"
+                            class="relative"
+                            data-custom-dropdown
+                        >
+
+                            <input
+                                type="hidden"
+                                id="purchase-supplier"
+                                name="{{ form.supplier.html_name }}"
+                                value="{{ form.supplier.value|default_if_none:'' }}"
+                                data-dropdown-input
+                            >
+
+                            <button
+                                type="button"
+                                data-dropdown-trigger
+                                aria-expanded="false"
+                                class="flex w-full items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-4 py-3 text-left text-sm text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                            >
+
+                                <span data-dropdown-label class="truncate">
+                                    Select Supplier
+                                </span>
+
+                                <i
+                                    data-lucide="chevron-down"
+                                    class="h-4 w-4 shrink-0"
+                                ></i>
+
+                            </button>
+
+                            <!-- SUPPLIER OPTIONS -->
+                            <div
+                                data-dropdown-menu
+                                class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-2 shadow-xl"
+                            >
+
+                                <div class="max-h-56 space-y-1 overflow-y-auto">
+
+                                    {% for supplier in form.fields.supplier.queryset %}
+
+                                    <button
+                                        type="button"
+                                        data-dropdown-option
+                                        data-value="{{ supplier.pk }}"
+                                        class="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green transition hover:bg-soft-green"
+                                    >
+                                        {{ supplier.name }}
+                                    </button>
+
+                                    {% empty %}
+
+                                    <p class="px-3 py-3 text-sm text-text-muted">
+                                        No active suppliers found.
+                                    </p>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% for error in form.supplier.errors %}
+                        <p class="mt-1 text-xs text-red-600">
+                            {{ error }}
+                        </p>
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- PURCHASE DATE -->
+                    <div>
+
+                        <label
+                            for="{{ form.purchase_date.id_for_label }}"
+                            class="mb-2 block text-sm font-semibold text-dark-green"
+                        >
+                            Purchase Date
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        {{ form.purchase_date }}
+
+                        {% for error in form.purchase_date.errors %}
+                        <p class="mt-1 text-xs text-red-600">
+                            {{ error }}
+                        </p>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <!-- NOTES -->
+                <div class="mt-5">
+
+                    <label class="mb-2 block text-sm font-semibold text-dark-green">
+                        Notes
+                        <span class="font-normal text-text-muted">
+                            (Optional)
+                        </span>
+                    </label>
+
+                    {{ form.notes }}
+
+                    {% for error in form.notes.errors %}
+                    <p class="mt-1 text-xs text-red-600">
+                        {{ error }}
+                    </p>
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+            <!-- ==========================================
+                 PURCHASE ITEMS
+            =========================================== -->
+            <section class="mb-6 rounded-2xl border border-border-light bg-white p-6 shadow-sm">
+
+                <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+
+                    <div>
+                        <h2 class="text-lg font-bold text-dark-green">
+                            Purchase Items
+                        </h2>
+
+                        <p class="mt-1 text-sm text-text-muted">
+                            Only products linked to your selected supplier are available.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="add-purchase-item"
+                        class="inline-flex items-center gap-2 rounded-xl bg-soft-green px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-emerald-100"
+                    >
+
+                        <i data-lucide="plus" class="h-4 w-4"></i>
+
+                        Add Item
+
+                    </button>
+
+                </div>
+
+                <!-- ITEMS -->
+                <div class="overflow-visible">
+
+                    <div class="min-w-[700px]">
+
+                        <!-- HEADINGS -->
+                        <div class="mb-3 grid grid-cols-12 gap-3 px-3 text-xs font-semibold uppercase text-text-muted">
+
+                            <div class="col-span-5">
+                                Product
+                            </div>
+
+                            <div class="col-span-2">
+                                Quantity
+                            </div>
+
+                            <div class="col-span-2">
+                                Unit Cost (£)
+                            </div>
+
+                            <div class="col-span-2 text-right">
+                                Total
+                            </div>
+
+                            <div class="col-span-1"></div>
+
+                        </div>
+
+                        <!-- ITEM ROWS -->
+                        <div id="purchase-items" class="space-y-3">
+
+                            {% for item_form in formset %}
+
+                            <div class="purchase-item-row relative grid grid-cols-12 items-start gap-3 rounded-xl border border-border-light p-3">
+
+                                {% for hidden in item_form.hidden_fields %}
+                                    {{ hidden }}
+                                {% endfor %}
+
+                                <!-- PRODUCT -->
+                                <div class="col-span-5">
+
+                                    <div class="relative" data-custom-dropdown>
+
+                                        <input
+                                            type="hidden"
+                                            name="{{ item_form.product.html_name }}"
+                                            value="{{ item_form.product.value|default_if_none:'' }}"
+                                            data-dropdown-input
+                                            class="purchase-product"
+                                        >
+
+                                        <button
+                                            type="button"
+                                            data-dropdown-trigger
+                                            aria-expanded="false"
+                                            class="flex w-full items-center justify-between gap-2 rounded-lg border border-border-light bg-white px-3 py-2.5 text-left text-sm text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                                        >
+
+                                            <span data-dropdown-label class="truncate">
+                                                Select Product
+                                            </span>
+
+                                            <i
+                                                data-lucide="chevron-down"
+                                                class="h-4 w-4 shrink-0"
+                                            ></i>
+
+                                        </button>
+
+                                        <!-- PRODUCT DROPDOWN -->
+                                        <div
+                                            data-dropdown-menu
+                                            class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-2 shadow-xl"
+                                        >
+
+                                            <input
+                                                type="search"
+                                                data-dropdown-search
+                                                placeholder="Search products..."
+                                                autocomplete="off"
+                                                class="mb-2 w-full rounded-lg border border-border-light px-3 py-2 text-sm outline-none focus:border-primary"
+                                            >
+
+                                            <div class="max-h-52 space-y-1 overflow-y-auto">
+
+                                                {% for product in item_form.fields.product.queryset %}
+
+                                                <button
+                                                    type="button"
+                                                    data-dropdown-option
+                                                    data-value="{{ product.pk }}"
+                                                    data-cost="{{ product.cost_price }}"
+                                                    data-suppliers="{% for linked_supplier in product.suppliers.all %}{{ linked_supplier.pk }} {% endfor %}"
+                                                    class="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green transition hover:bg-soft-green"
+                                                >
+                                                    {{ product.name }}
+                                                </button>
+
+                                                {% endfor %}
+
+                                            </div>
+
+                                            <p
+                                                data-no-products
+                                                class="hidden px-3 py-4 text-center text-sm text-text-muted"
+                                            >
+                                                No linked products found.
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    {% for error in item_form.product.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                    {% endfor %}
+
+                                </div>
+
+                                <!-- QUANTITY -->
+                                <div class="col-span-2">
+
+                                    <input
+                                        type="number"
+                                        name="{{ item_form.quantity.html_name }}"
+                                        value="{{ item_form.quantity.value|default_if_none:'' }}"
+                                        min="1"
+                                        step="1"
+                                        placeholder="0"
+                                        class="purchase-quantity w-full rounded-lg border border-border-light bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"
+                                    >
+
+                                    {% for error in item_form.quantity.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                    {% endfor %}
+
+                                </div>
+
+                                <!-- UNIT COST -->
+                                <div class="col-span-2">
+
+                                    <input
+                                        type="number"
+                                        name="{{ item_form.unit_cost.html_name }}"
+                                        value="{{ item_form.unit_cost.value|default_if_none:'' }}"
+                                        min="0"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        class="purchase-cost w-full rounded-lg border border-border-light bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"
+                                    >
+
+                                    {% for error in item_form.unit_cost.errors %}
+                                    <p class="mt-1 text-xs text-red-600">
+                                        {{ error }}
+                                    </p>
+                                    {% endfor %}
+
+                                </div>
+
+                                <!-- LINE TOTAL -->
+                                <div class="col-span-2 pt-3 text-right text-sm font-semibold text-dark-green">
+                                    £<span class="purchase-line-total">0.00</span>
+                                </div>
+
+                                <!-- DELETE -->
+                                <div class="col-span-1 flex justify-end">
+
+                                    <div class="hidden">
+                                        {{ item_form.DELETE }}
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        class="remove-purchase-item hidden rounded-lg p-2.5 text-red-500 transition hover:bg-red-50"
+                                        aria-label="Remove product"
+                                    >
+                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- GRAND TOTAL -->
+                <div class="mt-6 border-t border-border-light pt-5 text-right">
+
+                    <p class="text-sm text-text-muted">
+                        Grand Total
+                    </p>
+
+                    <p class="mt-1 text-3xl font-bold text-dark-green">
+                        £<span id="purchase-grand-total">0.00</span>
+                    </p>
+
+                </div>
+
+            </section>
+
+            <!-- FORM ACTIONS -->
+            <div class="flex justify-end gap-3">
+
+                <a
+                    href="{% url 'purchases:list' %}"
+                    class="rounded-xl border border-border-light bg-white px-6 py-3 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                >
+                    {{ submit_label }}
+                </button>
+
+            </div>
+
+        </form>
+
+        <!-- ==========================================
+             EMPTY ITEM TEMPLATE
+        =========================================== -->
+        <template id="empty-purchase-item-template">
+
+            <div class="purchase-item-row relative grid grid-cols-12 items-start gap-3 rounded-xl border border-border-light p-3">
+
+                {% for hidden in formset.empty_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+
+                <!-- PRODUCT -->
+                <div class="col-span-5">
+
+                    <div class="relative" data-custom-dropdown>
+
+                        <input
+                            type="hidden"
+                            name="{{ formset.empty_form.product.html_name }}"
+                            value=""
+                            data-dropdown-input
+                            class="purchase-product"
+                        >
+
+                        <button
+                            type="button"
+                            data-dropdown-trigger
+                            aria-expanded="false"
+                            class="flex w-full items-center justify-between gap-2 rounded-lg border border-border-light bg-white px-3 py-2.5 text-left text-sm text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                        >
+
+                            <span data-dropdown-label class="truncate">
+                                Select Product
+                            </span>
+
+                            <i
+                                data-lucide="chevron-down"
+                                class="h-4 w-4 shrink-0"
+                            ></i>
+
+                        </button>
+
+                        <!-- DROPDOWN -->
+                        <div
+                            data-dropdown-menu
+                            class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-2 shadow-xl"
+                        >
+
+                            <input
+                                type="search"
+                                data-dropdown-search
+                                placeholder="Search products..."
+                                autocomplete="off"
+                                class="mb-2 w-full rounded-lg border border-border-light px-3 py-2 text-sm outline-none focus:border-primary"
+                            >
+
+                            <div class="max-h-52 space-y-1 overflow-y-auto">
+
+                                {% for product in formset.empty_form.fields.product.queryset %}
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="{{ product.pk }}"
+                                    data-cost="{{ product.cost_price }}"
+                                    data-suppliers="{% for linked_supplier in product.suppliers.all %}{{ linked_supplier.pk }} {% endfor %}"
+                                    class="block w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green transition hover:bg-soft-green"
+                                >
+                                    {{ product.name }}
+                                </button>
+
+                                {% endfor %}
+
+                            </div>
+
+                            <p
+                                data-no-products
+                                class="hidden px-3 py-4 text-center text-sm text-text-muted"
+                            >
+                                No linked products found.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- QUANTITY -->
+                <div class="col-span-2">
+
+                    <input
+                        type="number"
+                        name="{{ formset.empty_form.quantity.html_name }}"
+                        value="1"
+                        min="1"
+                        step="1"
+                        placeholder="0"
+                        class="purchase-quantity w-full rounded-lg border border-border-light bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"
+                    >
+
+                </div>
+
+                <!-- UNIT COST -->
+                <div class="col-span-2">
+
+                    <input
+                        type="number"
+                        name="{{ formset.empty_form.unit_cost.html_name }}"
+                        value=""
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        class="purchase-cost w-full rounded-lg border border-border-light bg-white px-3 py-2.5 text-sm outline-none focus:border-primary"
+                    >
+
+                </div>
+
+                <!-- LINE TOTAL -->
+                <div class="col-span-2 pt-3 text-right text-sm font-semibold text-dark-green">
+                    £<span class="purchase-line-total">0.00</span>
+                </div>
+
+                <!-- REMOVE -->
+                <div class="col-span-1 flex justify-end">
+
+                    <div class="hidden">
+                        {{ formset.empty_form.DELETE }}
+                    </div>
+
+                    <button
+                        type="button"
+                        class="remove-purchase-item hidden rounded-lg p-2.5 text-red-500 transition hover:bg-red-50"
+                        aria-label="Remove product"
+                    >
+                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </template>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+<script src="{% static 'js/purchases.js' %}" defer></script>
+<script src="{% static 'js/purchase_supplier_fallback.js' %}" defer></script>
+
+{% endblock %}

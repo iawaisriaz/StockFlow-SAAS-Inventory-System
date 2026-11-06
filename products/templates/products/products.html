@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "partials/navbar.html" %}
+
+<div
+    id="app-layout"
+    class="min-h-screen bg-page-bg lg:ml-64"
+>
+
+    {% include "partials/header.html" %}
+
+    <main class="p-4 sm:p-6 lg:p-8">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+                <div class="mb-2 flex items-center gap-2 text-sm text-text-muted">
+
+                    <span>Inventory</span>
+
+                    <i
+                        data-lucide="chevron-right"
+                        class="h-4 w-4"
+                    ></i>
+
+                    <span class="font-medium text-dark-green">
+                        Products
+                    </span>
+
+                </div>
+
+                <h1 class="text-2xl font-bold text-dark-green sm:text-3xl">
+                    Products
+                </h1>
+
+                <p class="mt-2 text-sm text-text-muted">
+                    Create, organize and manage your store products.
+                </p>
+
+            </div>
+
+            {% if can_add_product %}
+            <button
+                type="button"
+                id="open-add-product"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                Add Product
+            </button>
+            {% endif %}
+
+        </div>
+
+        <!-- PRODUCTS TABLE -->
+        {% include "products/partials/_product_table.html" %}
+
+    </main>
+
+</div>
+
+<!-- ADD / EDIT MODAL -->
+{% if can_add_product or can_edit_product %}
+{% include "products/partials/_product_form_modal.html" %}
+{% endif %}
+
+<!-- VIEW MODAL -->
+{% include "products/partials/_product_view_modal.html" %}
+
+<!-- DELETE MODAL -->
+{% if can_delete_product %}
+{% include "products/partials/_product_delete_modal.html" %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+
+<!-- EXISTING PRODUCT JS -->
+<script src="{% static 'js/products.js' %}" defer></script>
+
+<!-- NEW COST REVIEW JS -->
+<script src="{% static 'js/product_cost_review.js' %}" defer></script>
+<script src="{% static 'js/product_markup.js' %}" defer></script>
+
+{% endblock %}

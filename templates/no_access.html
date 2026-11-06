@@ -1,0 +1,88 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+<!-- ================= PAGE TITLE ================= -->
+{% block title %}
+    No Access | StockFlow
+{% endblock %}
+
+
+<!-- ================= CSS ================= -->
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+
+{% endblock %}
+
+
+<!-- ================= CONTENT ================= -->
+{% block content %}
+
+<!-- ================= SIDEBAR ================= -->
+{% include "partials/navbar.html" %}
+
+
+<!-- ================= DASHBOARD LAYOUT ================= -->
+<div
+    id="app-layout"
+    class="min-h-screen bg-gray-50 lg:ml-64"
+>
+
+    <!-- ================= HEADER ================= -->
+    {% include "partials/header.html" %}
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
+
+        <!-- ================= NO ACCESS MESSAGE ================= -->
+        <div class="flex min-h-[70vh] items-center justify-center">
+
+            <div class="mx-auto w-full max-w-lg text-center">
+
+                <!-- LOCK ICON -->
+                <div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50">
+
+                    <i
+                        data-lucide="lock-keyhole"
+                        class="h-11 w-11 text-emerald-700"
+                    ></i>
+
+                </div>
+
+
+                <!-- TITLE -->
+                <h1 class="text-2xl font-bold tracking-tight text-[var(--color-forest)] sm:text-3xl">
+                    No Access
+                </h1>
+
+
+                <!-- DESCRIPTION -->
+                <p class="mt-4 text-base font-medium text-gray-700">
+                    You don't have any permissions right now.
+                </p>
+
+                <p class="mt-2 text-sm leading-6 text-gray-500">
+                    Please contact your business owner to request access.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}
+
+
+<!-- ================= JAVASCRIPT ================= -->
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+
+{% endblock %}

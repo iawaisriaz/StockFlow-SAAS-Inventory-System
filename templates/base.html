@@ -1,0 +1,193 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ===== META ===== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="{% block meta_description %}StockFlow - A smart inventory and sales management system for businesses.{% endblock %}">
+
+    <meta name="theme-color" content="#123C32">
+
+    <!-- ===== PAGE TITLE ===== -->
+    <title>
+        {% block title %}StockFlow | Inventory Management{% endblock %}
+    </title>
+
+    <!-- ===== FAVICON ===== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
+
+
+    <!-- ===== GOOGLE FONTS ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- ===== TAILWIND CSS ===== -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ===== TAILWIND THEME CONFIG ===== -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#16856A",
+                        "primary-dark": "#0F6B55",
+
+                        secondary: "#123C32",
+
+                        "dark-green": "#123C32",
+                        "soft-green": "#E9F5EF",
+
+                        "page-bg": "#F8FAF9",
+
+                        "text-main": "#172B25",
+                        "text-muted": "#64746D",
+
+                        "border-light": "#E2EAE5"
+                    },
+
+                    fontFamily: {
+                        sans: ["Inter", "Arial", "sans-serif"]
+                    },
+
+                    boxShadow: {
+                        card: "0 2px 12px rgba(18, 60, 50, 0.05)"
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- ===== GLOBAL CSS ===== -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- ===== PAGE SPECIFIC CSS ===== -->
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-page-bg text-text-main font-sans antialiased">
+
+    
+    <!-- ================= DJANGO MESSAGES ================= -->
+
+    {% if messages %}
+
+        <div
+            class="fixed right-5 top-5 z-[100] w-[calc(100%-2rem)] max-w-sm space-y-3"
+            aria-live="polite"
+        >
+
+            {% for message in messages %}
+
+                <div
+                    role="alert"
+                    class="flex items-start gap-3 rounded-xl border bg-white px-4 py-4 shadow-lg
+
+                    {% if 'success' in message.tags %}
+                        border-green-500
+
+                    {% elif 'error' in message.tags %}
+                        border-red-500
+
+                    {% elif 'warning' in message.tags %}
+                        border-amber-500
+
+                    {% else %}
+                        border-gray-300
+                    {% endif %}
+                    "
+                >
+
+                    <!-- STATUS ICON -->
+
+                    <div class="mt-0.5 shrink-0">
+
+                        {% if 'success' in message.tags %}
+
+                            <i
+                                data-lucide="circle-check"
+                                class="h-5 w-5 text-green-600"
+                            ></i>
+
+                        {% elif 'error' in message.tags %}
+
+                            <i
+                                data-lucide="circle-x"
+                                class="h-5 w-5 text-red-600"
+                            ></i>
+
+                        {% elif 'warning' in message.tags %}
+
+                            <i
+                                data-lucide="triangle-alert"
+                                class="h-5 w-5 text-amber-600"
+                            ></i>
+
+                        {% else %}
+
+                            <i
+                                data-lucide="info"
+                                class="h-5 w-5 text-gray-500"
+                            ></i>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- MESSAGE TEXT: ALWAYS BLACK -->
+
+                    <p class="min-w-0 flex-1 text-sm font-medium leading-6 text-gray-900">
+                        {{ message }}
+                    </p>
+
+
+                    <!-- CLOSE BUTTON -->
+
+                    <button
+                        type="button"
+                        aria-label="Close notification"
+                        onclick="this.closest('[role=alert]').remove()"
+                        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-gray-500 transition hover:bg-gray-100 hover:text-gray-800"
+                    >
+                        <i
+                            data-lucide="x"
+                            class="h-4 w-4"
+                        ></i>
+                    </button>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- ===== MAIN PAGE CONTENT ===== -->
+    {% block content %}{% endblock %}
+
+    <!-- ===== PAGE SPECIFIC JAVASCRIPT ===== -->
+    {% block extra_js %}{% endblock %}
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+    <script> lucide.createIcons(); </script>
+
+</body>
+</html>

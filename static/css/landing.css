@@ -1,0 +1,12 @@
+/* ======= LANDING PAGE STYLES ======= */
+.hero-pattern { background-image: radial-gradient(circle at 15% 20%, rgba(22,133,106,.08), transparent 35%), radial-gradient(circle at 90% 75%, rgba(22,133,106,.06), transparent 35%); }
+.dashboard-shadow { box-shadow: 0 24px 70px rgba(18,60,50,.10); }
+.feature-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 14px 35px rgba(18,60,50,.08); border-color: rgba(22,133,106,.35); }
+.industry-card { transition: border-color .2s ease, transform .2s ease; }
+.industry-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+.chart-bar { flex: 1; min-width: 0; border-radius: 5px 5px 0 0; background: #B7E1D2; }
+.chart-bar.active { background: var(--color-primary); }
+/* Mobile navigation is hidden by default, independent of JavaScript. */
+.mobile-menu { display: none; }
+.mobile-menu.is-open { display: block; }

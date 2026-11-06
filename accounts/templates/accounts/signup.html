@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Account | StockFlow{% endblock %}
+
+{% block content %}
+
+<!-- ======= SIGNUP PAGE ======= -->
+<main class="min-h-screen bg-page-bg lg:grid lg:grid-cols-2">
+
+    <!-- Left Information Panel -->
+    <section class="hidden bg-dark-green p-12 text-white lg:flex lg:flex-col lg:justify-between">
+
+        <!-- Brand -->
+        <a href="{% url 'landing' %}" class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15">
+                <i data-lucide="boxes" class="h-6 w-6"></i>
+            </div>
+
+            <span class="text-2xl font-bold">
+                Stock<span class="text-primary">Flow</span>
+            </span>
+        </a>
+
+        <!-- Hero Content -->
+        <div class="flex w-full max-w-lg flex-1 flex-col justify-center">
+
+            <h1 class="text-5xl font-extrabold leading-tight">
+                Grow your business,<br>all in one place.
+            </h1>
+
+            <p class="mt-6 text-lg leading-8 text-white/70">
+                Organise products, track inventory, manage sales,
+                and keep your business moving forward.
+            </p>
+
+            <div class="mt-10 space-y-5">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="check-circle-2" class="h-5 w-5 text-emerald-400"></i>
+                    <span>Manage products and inventory</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <i data-lucide="check-circle-2" class="h-5 w-5 text-emerald-400"></i>
+                    <span>Track purchases and sales</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <i data-lucide="check-circle-2" class="h-5 w-5 text-emerald-400"></i>
+                    <span>Manage your business team</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Right Signup Form -->
+    <section class="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
+
+        <div class="w-full max-w-md">
+
+            <!-- Mobile Brand -->
+            <a href="{% url 'landing' %}"
+               class="mb-10 inline-flex items-center gap-2 text-2xl font-extrabold text-dark-green lg:hidden">
+                Stock<span class="text-primary">Flow</span>
+            </a>
+
+            
+            <!-- Heading -->
+            <div class="mb-9">
+                <h2 class="text-3xl font-extrabold tracking-tight text-dark-green">
+                    Create your account
+                </h2>
+
+                <p class="mt-3 text-sm text-text-muted">
+                    Get started with StockFlow business management.
+                </p>
+            </div>
+
+            <!-- Signup Form -->
+            <form method="POST" action="{% url 'signup' %}" class="space-y-5">
+                {% csrf_token %}
+                <!-- ======= FORM ERRORS ======= -->
+                {% if form.errors %}
+                    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ field.label }}: {{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+
+                
+                <!-- Username & Business Name -->
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+                    <!-- Username -->
+                    <div>
+                        <label for="id_username"
+                            class="mb-2 block text-sm font-semibold text-dark-green">
+                            Username
+                        </label>
+
+                        <input
+                            type="text"
+                            id="id_username"
+                            name="username"
+                            value="{{ form.username.value|default_if_none:'' }}"
+                            autocomplete="username"
+                            required
+                            placeholder="Enter your username"
+                            class="w-full rounded-lg border border-border-light bg-white px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                        {% for error in form.username.errors %}
+                            <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Business Name -->
+                    <div>
+                        <label for="id_business_name"
+                            class="mb-2 block text-sm font-semibold text-dark-green">
+                            Business Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="id_business_name"
+                            name="business_name"
+                            value="{{ form.business_name.value|default_if_none:'' }}"
+                            placeholder="Enter your business name"
+                            maxlength="150"
+                            required
+                            class="w-full rounded-lg border border-border-light bg-white px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                        {% for error in form.business_name.errors %}
+                            <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+
+                <!-- Email -->
+                <div>
+                    <label for="id_email"
+                           class="mb-2 block text-sm font-semibold text-dark-green">
+                        Email address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="id_email"
+                        name="email"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                        autocomplete="email"
+                        required
+                        placeholder="you@example.com"
+                        class="w-full rounded-lg border border-border-light bg-white px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                    {% for error in form.email.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="id_password1"
+                           class="mb-2 block text-sm font-semibold text-dark-green">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="id_password1"
+                        name="password1"
+                        autocomplete="new-password"
+                        required
+                        placeholder="Create a strong password"
+                        class="w-full rounded-lg border border-border-light bg-white px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                    {% for error in form.password1.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+
+                    <p class="mt-2 text-xs text-text-muted">
+                        Use a password that is difficult to guess.
+                    </p>
+                </div>
+
+                <!-- Confirm Password -->
+                <div>
+                    <label for="id_password2"
+                           class="mb-2 block text-sm font-semibold text-dark-green">
+                        Confirm password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="id_password2"
+                        name="password2"
+                        autocomplete="new-password"
+                        required
+                        placeholder="Enter your password again"
+                        class="w-full rounded-lg border border-border-light bg-white px-4 py-3.5 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                    {% for error in form.password2.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+
+
+                <!-- Submit Button -->
+                <button
+                    type="submit"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                >
+                    Create Account
+                    <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </button>
+            </form>
+
+            <!-- Login Link -->
+            <p class="mt-8 text-center text-sm text-text-muted">
+                Already have an account?
+                <a href="{% url 'login' %}"
+                   class="font-semibold text-primary hover:underline">
+                    Sign in
+                </a>
+            </p>
+
+        </div>
+    </section>
+</main>
+
+{% endblock %}
+

@@ -1,0 +1,378 @@
+<section class="overflow-hidden rounded-2xl border border-border-light bg-white shadow-card">
+
+    <!-- TABLE HEADER -->
+    <div class="flex flex-col gap-4 border-b border-border-light p-5 sm:flex-row sm:items-center sm:justify-between">
+
+        <!-- LEFT SIDE -->
+        <div>
+
+            <div class="flex items-center gap-3">
+
+                <h2 class="text-lg font-bold text-dark-green">
+                    All Categories
+                </h2>
+
+                <!-- TOTAL CATEGORIES -->
+                <span class="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-soft-green px-2 text-xs font-bold text-primary">
+                    {{ total_categories }}
+                </span>
+
+            </div>
+
+            <p class="mt-1 text-sm text-text-muted">
+                View and manage all your categories.
+            </p>
+
+        </div>
+
+        <!-- SEARCH FORM -->
+        <form
+            method="get"
+            action="{% url 'categories:list' %}"
+            class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row"
+        >
+
+            <!-- SEARCH INPUT -->
+            <div class="relative flex-1 sm:w-72">
+
+                <i
+                    data-lucide="search"
+                    class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
+                ></i>
+
+                <input
+                    type="search"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="Search categories..."
+                    class="w-full rounded-xl border border-border-light bg-white py-2.5 pl-10 pr-4 text-sm text-text-main outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                >
+
+            </div>
+
+            <!-- SEARCH BUTTON -->
+            <button
+                type="submit"
+                class="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                Search
+            </button>
+
+            <!-- CLEAR SEARCH -->
+            {% if search_query %}
+
+            <a
+                href="{% url 'categories:list' %}"
+                class="inline-flex items-center justify-center rounded-xl border border-border-light px-4 py-2.5 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+            >
+                Clear
+            </a>
+
+            {% endif %}
+
+        </form>
+
+    </div>
+
+
+    <!-- CATEGORIES TABLE -->
+    <div class="overflow-x-auto">
+
+        <table class="w-full min-w-[700px] text-left">
+
+            <!-- TABLE HEAD -->
+            <thead class="bg-page-bg">
+
+                <tr class="text-xs font-semibold uppercase tracking-wide text-text-muted">
+
+                    <th class="px-6 py-4">
+                        Category Name
+                    </th>
+
+                    <th class="px-6 py-4">
+                        Description
+                    </th>
+
+                    <th class="px-6 py-4">
+                        Created Date
+                    </th>
+
+                    <th class="px-6 py-4 text-right">
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <!-- TABLE BODY -->
+            <tbody class="divide-y divide-border-light">
+
+                {% for category in page_obj %}
+
+                <tr class="transition hover:bg-page-bg">
+
+                    <!-- CATEGORY NAME -->
+                    <td class="px-6 py-4">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-soft-green">
+
+                                <i
+                                    data-lucide="folder"
+                                    class="h-5 w-5 text-primary"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-sm font-semibold text-dark-green">
+                                {{ category.name }}
+                            </span>
+
+                        </div>
+
+                    </td>
+
+
+                    <!-- DESCRIPTION -->
+                    <td class="max-w-sm px-6 py-4">
+
+                        <p class="text-sm leading-6 text-text-muted">
+                            {{ category.description|default:"No description"|truncatechars:65 }}
+                        </p>
+
+                    </td>
+
+
+                    <!-- CREATED DATE -->
+                    <td class="whitespace-nowrap px-6 py-4">
+
+                        <span class="text-sm text-text-muted">
+                            {{ category.created_at|date:"d M Y" }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- ACTION BUTTONS -->
+                    <td class="px-6 py-4">
+
+                        <div class="flex items-center justify-end gap-2">
+
+                            <!-- VIEW -->
+                            <button
+                                type="button"
+                                title="View Category"
+                                class="view-category rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                data-name="{{ category.name }}"
+                                data-description="{{ category.description }}"
+                                data-created="{{ category.created_at|date:'d M Y' }}"
+                            >
+
+                                <i
+                                    data-lucide="eye"
+                                    class="h-4 w-4"
+                                ></i>
+
+                            </button>
+
+
+                            {% if can_edit_category %}
+                            <!-- EDIT -->
+                            <button
+                                type="button"
+                                title="Edit Category"
+                                class="edit-category rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                data-name="{{ category.name }}"
+                                data-description="{{ category.description }}"
+                                data-url="{% url 'categories:edit' category.pk %}"
+                            >
+
+                                <i
+                                    data-lucide="pencil"
+                                    class="h-4 w-4"
+                                ></i>
+
+                            </button>
+
+
+                            {% endif %}
+                            {% if can_delete_category %}
+                            <!-- DELETE -->
+                            <button
+                                type="button"
+                                title="Delete Category"
+                                class="delete-category rounded-lg p-2 text-red-500 transition hover:bg-red-50"
+                                data-name="{{ category.name }}"
+                                data-url="{% url 'categories:delete' category.pk %}"
+                            >
+
+                                <i
+                                    data-lucide="trash-2"
+                                    class="h-4 w-4"
+                                ></i>
+
+                            </button>
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <!-- EMPTY STATE -->
+                <tr>
+
+                    <td colspan="4" class="px-6 py-16 text-center">
+
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-soft-green">
+
+                            <i
+                                data-lucide="folder-open"
+                                class="h-8 w-8 text-primary"
+                            ></i>
+
+                        </div>
+
+                        <h3 class="mt-4 text-base font-semibold text-dark-green">
+                            No Categories Found
+                        </h3>
+
+                        <p class="mt-2 text-sm text-text-muted">
+
+                            {% if search_query %}
+
+                                No categories match your search.
+
+                            {% else %}
+
+                                You haven't created any categories yet.
+
+                            {% endif %}
+
+                        </p>
+
+                        {% if not search_query and can_add_category %}
+
+                        <button
+                            type="button"
+                            id="empty-add-category"
+                            class="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                        >
+
+                            <i
+                                data-lucide="plus"
+                                class="h-4 w-4"
+                            ></i>
+
+                            Add First Category
+
+                        </button>
+
+                        {% else %}
+
+                        <a
+                            href="{% url 'categories:list' %}"
+                            class="mt-5 inline-flex items-center rounded-xl border border-border-light px-5 py-2.5 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+                        >
+                            Clear Search
+                        </a>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+    {% if page_obj.paginator.num_pages > 1 %}
+
+    <div class="flex flex-col gap-3 border-t border-border-light px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+
+        <!-- PAGINATION INFORMATION -->
+        <p class="text-sm text-text-muted">
+
+            Showing
+            {{ page_obj.start_index }}
+            to
+            {{ page_obj.end_index }}
+            of
+            {{ page_obj.paginator.count }}
+            categories
+
+        </p>
+
+
+        <!-- PAGINATION BUTTONS -->
+        <div class="flex items-center gap-2">
+
+            <!-- PREVIOUS -->
+            {% if page_obj.has_previous %}
+
+            <a
+                href="?q={{ search_query|urlencode }}&page={{ page_obj.previous_page_number }}"
+                class="inline-flex items-center gap-1 rounded-lg border border-border-light px-4 py-2 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+            >
+
+                <i
+                    data-lucide="chevron-left"
+                    class="h-4 w-4"
+                ></i>
+
+                Previous
+
+            </a>
+
+            {% endif %}
+
+
+            <!-- CURRENT PAGE -->
+            <span class="rounded-lg bg-soft-green px-4 py-2 text-sm font-semibold text-primary">
+
+                {{ page_obj.number }}
+                /
+                {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            <!-- NEXT -->
+            {% if page_obj.has_next %}
+
+            <a
+                href="?q={{ search_query|urlencode }}&page={{ page_obj.next_page_number }}"
+                class="inline-flex items-center gap-1 rounded-lg border border-border-light px-4 py-2 text-sm font-medium text-dark-green transition hover:bg-page-bg"
+            >
+
+                Next
+
+                <i
+                    data-lucide="chevron-right"
+                    class="h-4 w-4"
+                ></i>
+
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</section>

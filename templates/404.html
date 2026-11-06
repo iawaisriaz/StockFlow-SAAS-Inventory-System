@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}404 | Page Not Found - StockFlow{% endblock %}
+
+{% block meta_description %}The requested page could not be found on StockFlow.{% endblock %}
+
+{% block content %}
+
+<!-- ======= 404 ERROR PAGE ======= -->
+
+<main class="flex min-h-screen items-center justify-center bg-page-bg px-5 py-12">
+
+    <div class="mx-auto w-full max-w-2xl text-center">
+
+        <!-- Error Number -->
+        <div class="relative mb-8">
+
+            <div class="absolute inset-0 mx-auto h-full w-64 rounded-full bg-soft-green blur-3xl"></div>
+
+            <h1 class="relative text-[120px] font-extrabold leading-none tracking-tighter text-primary sm:text-[170px]">
+                404
+            </h1>
+
+        </div>
+
+        <!-- Error Message -->
+        <div class="mx-auto max-w-lg">
+
+            <h2 class="mt-6 text-3xl font-extrabold tracking-tight text-dark-green sm:text-4xl">
+                Oops! This page doesn't exist.
+            </h2>
+
+            <p class="mx-auto mt-5 max-w-md text-base leading-8 text-text-muted">
+                The page you're looking for may have been moved,
+                deleted, or the URL might be incorrect.
+            </p>
+
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+
+            <a href="{% url 'landing' %}"
+               class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-7 py-4 text-sm font-semibold text-white transition hover:bg-primary-dark sm:w-auto">
+
+                Go Back
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                >
+                    <path d="M5 12h14"/>
+                    <path d="m13 6 6 6-6 6"/>
+                </svg>
+
+            </a>
+
+            <a href="{% url 'landing' %}#features"
+               class="inline-flex w-full items-center justify-center rounded-lg border border-border-light bg-white px-7 py-4 text-sm font-semibold text-dark-green transition hover:border-primary sm:w-auto">
+
+                Explore Features
+
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}

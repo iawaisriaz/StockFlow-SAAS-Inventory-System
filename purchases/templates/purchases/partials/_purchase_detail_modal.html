@@ -1,0 +1,236 @@
+
+<!-- MODAL HEADER -->
+<div class="flex items-start justify-between gap-4 border-b border-border-light p-5 sm:p-6">
+
+    <div>
+        <div class="flex flex-wrap items-center gap-3">
+
+            <h2 class="text-2xl font-bold text-dark-green">
+                {{ purchase.reference }}
+            </h2>
+
+            {% if purchase.status == "received" %}
+            <span class="rounded-full bg-soft-green px-3 py-1 text-xs font-semibold text-primary">
+                Received
+            </span>
+
+            {% elif purchase.status == "cancelled" %}
+            <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+                Cancelled
+            </span>
+
+            {% else %}
+            <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                Draft
+            </span>
+            {% endif %}
+        </div>
+
+        <p class="mt-1 text-sm text-text-muted">
+            Purchase details and inventory information
+        </p>
+    </div>
+
+    <!-- CLOSE BUTTON -->
+    <button
+        type="button"
+        data-close-dialog="purchase-detail-dialog"
+        class="rounded-xl p-2 text-text-muted transition hover:bg-page-bg hover:text-dark-green"
+        aria-label="Close purchase details"
+    >
+        <i data-lucide="x" class="h-5 w-5"></i>
+    </button>
+</div>
+
+<!-- MODAL BODY -->
+<div class="max-h-[65vh] overflow-y-auto p-5 sm:p-6">
+
+    <!-- PURCHASE INFORMATION -->
+    <section class="rounded-xl border border-border-light p-5">
+
+        <h3 class="mb-5 text-lg font-bold text-dark-green">
+            Purchase Information
+        </h3>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+            <div>
+                <p class="text-xs text-text-muted">Supplier</p>
+                <p class="mt-1 text-sm font-semibold text-dark-green">
+                    {{ purchase.supplier.name }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-xs text-text-muted">Purchase Date</p>
+                <p class="mt-1 text-sm font-semibold text-dark-green">
+                    {{ purchase.purchase_date|date:"d M Y" }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-xs text-text-muted">Reference</p>
+                <p class="mt-1 text-sm font-semibold text-dark-green">
+                    {{ purchase.reference }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-xs text-text-muted">Received Date</p>
+                <p class="mt-1 text-sm font-semibold text-dark-green">
+                    {% if purchase.received_at %}
+                        {{ purchase.received_at|date:"d M Y, H:i" }}
+                    {% else %}
+                        Not received
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        {% if purchase.notes %}
+        <div class="mt-5 border-t border-border-light pt-4">
+            <p class="text-xs text-text-muted">Notes</p>
+            <p class="mt-1 whitespace-pre-line text-sm text-text-main">
+                {{ purchase.notes }}
+            </p>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- PURCHASED PRODUCTS -->
+    <section class="mt-5 overflow-hidden rounded-xl border border-border-light">
+
+        <div class="border-b border-border-light p-5">
+            <h3 class="text-lg font-bold text-dark-green">
+                Purchased Products
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[550px] text-left">
+
+                <thead class="bg-page-bg text-xs uppercase text-text-muted">
+                    <tr>
+                        <th class="px-5 py-3">Product</th>
+                        <th class="px-5 py-3">Quantity</th>
+                        <th class="px-5 py-3">Unit Cost</th>
+                        <th class="px-5 py-3 text-right">Total</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-border-light">
+
+                    {% for item in purchase.items.all %}
+                    <tr>
+                        <td class="px-5 py-4 text-sm font-medium text-dark-green">
+                            {{ item.product.name }}
+                        </td>
+
+                        <td class="px-5 py-4 text-sm text-text-main">
+                            {{ item.quantity }}
+                        </td>
+
+                        <td class="px-5 py-4 text-sm text-text-main">
+                            £{{ item.unit_cost|floatformat:2 }}
+                        </td>
+
+                        <td class="px-5 py-4 text-right text-sm font-semibold text-dark-green">
+                            £{{ item.line_total|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- GRAND TOTAL -->
+        <div class="border-t border-border-light p-5 text-right">
+            <p class="text-sm text-text-muted">Grand Total</p>
+            <p class="mt-1 text-2xl font-bold text-dark-green">
+                £{{ purchase.total_amount|floatformat:2 }}
+            </p>
+        </div>
+    </section>
+
+    <!-- CANCELLED INFORMATION -->
+    {% if purchase.status == "cancelled" %}
+
+    <div class="mt-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+        <i data-lucide="ban" class="mt-0.5 h-5 w-5 shrink-0 text-red-600"></i>
+
+        <p class="text-sm font-medium text-red-700">
+            This purchase has been cancelled.
+
+            {% if purchase.cancelled_at %}
+                Cancelled on {{ purchase.cancelled_at|date:"d M Y, H:i" }}.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- RECEIVED INFORMATION -->
+    {% elif purchase.status == "received" %}
+
+    <div class="mt-5 flex items-start gap-3 rounded-xl border border-green-200 bg-soft-green p-4">
+        <i
+            data-lucide="check-circle-2"
+            class="mt-0.5 h-5 w-5 shrink-0 text-primary"
+        ></i>
+
+        <p class="text-sm font-medium leading-6 text-primary">
+            This purchase has been received successfully.
+            Inventory stock has been updated.
+            This purchase is now read-only.
+        </p>
+    </div>
+
+    {% endif %}
+</div>
+
+<!-- ACTION FOOTER: ONLY FOR DRAFT -->
+{% if purchase.status == "draft" %}
+
+<div class="flex flex-wrap items-center justify-end gap-3 border-t border-border-light bg-page-bg p-5 sm:p-6">
+
+    {% if can_edit_purchase %}
+    <!-- EDIT DRAFT -->
+    <a
+        href="{% url 'purchases:edit' purchase.pk %}"
+        class="inline-flex items-center gap-2 rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green transition hover:bg-gray-50"
+    >
+        <i data-lucide="pencil" class="h-4 w-4"></i>
+        Edit Draft
+    </a>
+
+    <!-- CANCEL DRAFT -->
+    <button
+        type="button"
+        data-confirm-action
+        data-title="Cancel Purchase?"
+        data-message="Are you sure you want to cancel this draft purchase? Inventory stock will not be affected."
+        data-url="{% url 'purchases:cancel' purchase.pk %}"
+        data-label="Cancel Purchase"
+        data-danger="true"
+        class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+    >
+        <i data-lucide="ban" class="h-4 w-4"></i>
+        Cancel Purchase
+    </button>
+
+    <!-- MARK AS RECEIVED -->
+    <button
+        type="button"
+        data-confirm-action
+        data-title="Confirm Goods Received?"
+        data-message="This will increase inventory stock and mark this purchase as received. The purchase will become read-only."
+        data-url="{% url 'purchases:receive' purchase.pk %}"
+        data-label="Confirm Received"
+        data-danger="false"
+        class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+    >
+        <i data-lucide="package-check" class="h-4 w-4"></i>
+        Mark as Received
+    </button>
+    {% endif %}
+</div>
+
+{% endif %}

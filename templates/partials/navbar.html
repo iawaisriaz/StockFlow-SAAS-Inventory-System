@@ -1,0 +1,301 @@
+<!-- ================= STOCKFLOW SIDEBAR ================= -->
+
+{% with current_url=request.resolver_match.url_name current_namespace=request.resolver_match.namespace %}
+
+<!-- Mobile Overlay -->
+<div
+    id="sidebar-overlay"
+    class="fixed inset-0 z-40 hidden bg-black/50 lg:hidden"
+></div>
+
+<!-- Sidebar -->
+<aside
+    id="stockflow-sidebar"
+    aria-label="Main navigation"
+    class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col overflow-hidden bg-[var(--color-forest)] text-white shadow-xl transition-all duration-300 ease-in-out lg:translate-x-0 lg:shadow-none"
+>
+
+    <!-- ================= BRAND ================= -->
+    <div class="flex h-20 shrink-0 items-center justify-between border-b border-white/10 px-4">
+
+        <a
+            href="{% if is_business_owner or 'dashboard' in allowed_modules %}{% url 'dashboard' %}{% else %}{% url 'employees:no_access' %}{% endif %}"
+            class="sidebar-brand flex min-w-0 items-center gap-3"
+            title="StockFlow"
+        >
+            <!-- StockFlow Icon -->
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white">
+                <i data-lucide="boxes" class="h-6 w-6"></i>
+            </span>
+
+            <!-- Brand Text -->
+            <span class="sidebar-label truncate text-2xl font-extrabold tracking-tight text-white">
+                Stock<span class="text-[var(--color-primary)]">Flow</span>
+            </span>
+        </a>
+
+        <!-- Mobile Close Button -->
+        <button
+            id="sidebar-close"
+            type="button"
+            aria-label="Close navigation"
+            class="shrink-0 rounded-lg p-2 text-white/80 hover:bg-white/10 lg:hidden"
+        >
+            <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+
+    </div>
+
+    <!-- ================= NAVIGATION ================= -->
+    <nav class="flex-1 space-y-1 overflow-y-auto overflow-x-hidden px-3 py-6">
+        {% if 'dashboard' in allowed_modules %}
+
+        <!-- 1. Dashboard -->
+        <a
+            href="{% url 'dashboard' %}"
+            data-nav="dashboard"
+            title="Dashboard"
+            {% if current_url == 'dashboard' and not current_namespace %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_url == 'dashboard' and not current_namespace %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="house" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Dashboard</span>
+        </a>
+        {% endif %}
+        {% if 'categories' in allowed_modules %}
+
+
+
+        <!-- 2. Categories -->
+        <a
+            href="{% url 'categories:list' %}"
+            data-nav="categories"
+            title="Categories"
+            {% if current_namespace == 'categories' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'categories' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="layout-grid" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Categories</span>
+        </a>
+        {% endif %}
+        {% if 'products' in allowed_modules %}
+
+
+
+        <!-- 3. Products -->
+        <a
+            href="{% url 'products:list' %}"
+            data-nav="products"
+            title="Products"
+            {% if current_namespace == 'products' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'products' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="package" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Products</span>
+        </a>
+        {% endif %}
+        {% if 'suppliers' in allowed_modules %}
+
+
+
+        <!-- 4. Suppliers -->
+        <a
+            href="{% url 'suppliers:list' %}"
+            data-nav="suppliers"
+            title="Suppliers"
+            {% if current_namespace == 'suppliers' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'suppliers' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="truck" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Suppliers</span>
+        </a>
+        {% endif %}
+        {% if 'purchases' in allowed_modules %}
+
+
+
+        <!-- 5. Purchases -->
+        <a
+            href="{% url 'purchases:list' %}"
+            data-nav="purchases"
+            title="Purchases"
+            {% if current_namespace == 'purchases' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'purchases' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="shopping-cart" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Purchases</span>
+        </a>
+        {% endif %}
+        {% if 'customers' in allowed_modules %}
+
+
+
+        <!-- 6. Customers -->
+        <a
+            href="{% url 'customers:list' %}"
+            data-nav="customers"
+            title="Customers"
+            {% if current_namespace == 'customers' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'customers' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="users" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Customers</span>
+        </a>
+        {% endif %}
+        {% if 'sales' in allowed_modules %}
+
+
+
+        <!-- 7. Sales -->
+        <a
+            href="{% url 'sales:list' %}"
+            data-nav="sales"
+            title="Sales"
+            {% if current_namespace == 'sales' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'sales' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="shopping-bag" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Sales</span>
+        </a>
+        {% endif %}
+        {% if 'returns' in allowed_modules %}
+
+
+
+        <!-- 8. Returns -->
+        <a
+            href="{% url 'returns:list' %}"
+            data-nav="returns"
+            title="Returns"
+            {% if current_namespace == 'returns' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'returns' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="rotate-ccw" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Returns</span>
+        </a>
+        {% endif %}
+        {% if 'reports' in allowed_modules %}
+
+
+
+        <!-- 9. Reports -->
+        <a
+            href="{% url 'reports:overview' %}"
+            data-nav="reports"
+            title="Reports"
+            {% if current_namespace == 'reports' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'reports' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="chart-column" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Reports</span>
+        </a>
+        {% endif %}
+
+
+        
+        {% if is_business_owner %}
+        <!-- 10. Employees (Owner Only) -->
+        <a
+            href="{% url 'employees:list' %}"
+            data-nav="employees"
+            title="Employees"
+            {% if current_namespace == 'employees' %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_namespace == 'employees' %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="user-round-cog" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Employees</span>
+        </a>
+
+        <!-- 10. Settings -->
+        <a
+            href="{% url 'settings' %}"
+            data-nav="settings"
+            title="Settings"
+            {% if current_url == 'settings' and not current_namespace %}aria-current="page"{% endif %}
+            class="nav-link flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium transition-colors
+            {% if current_url == 'settings' and not current_namespace %}
+                bg-[var(--color-primary)] font-semibold text-white
+            {% else %}
+                text-white/85 hover:bg-white/10 hover:text-white
+            {% endif %}"
+        >
+            <i data-lucide="settings" class="h-5 w-5 shrink-0"></i>
+            <span class="sidebar-label">Settings</span>
+        </a>
+        {% endif %}
+
+    </nav>
+
+    <!-- ================= LOGOUT ================= -->
+    <div class="shrink-0 border-t border-white/15 p-3">
+
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                title="Logout"
+                aria-label="Logout"
+                class="sidebar-logout flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-red-200 transition-colors hover:bg-red-500/15 hover:text-red-100"
+            >
+                <i data-lucide="log-out" class="h-5 w-5 shrink-0"></i>
+                <span class="sidebar-label">Logout</span>
+            </button>
+
+        </form>
+
+    </div>
+
+</aside>
+
+{% endwith %}

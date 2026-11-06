@@ -1,0 +1,1301 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "partials/navbar.html" %}
+
+<div id="app-layout" class="min-h-screen bg-page-bg lg:ml-64">
+
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- ============================================ -->
+        <!-- PAGE HEADER -->
+        <!-- ============================================ -->
+
+        <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+
+            <div>
+                <h1 class="text-3xl font-bold text-dark-green">
+                    Sales
+                </h1>
+
+                <p class="mt-1 text-sm text-text-muted">
+                    Manage daily sales and transaction history.
+                </p>
+            </div>
+
+            {% if can_add_sale %}
+            <a
+                href="{% url 'sales:new' %}"
+                class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                New Sale
+            </a>
+            {% endif %}
+
+        </div>
+
+
+        <!-- ============================================ -->
+        <!-- DJANGO MESSAGES -->
+        <!-- ============================================ -->
+
+        {% if messages %}
+
+        <div class="mb-6 space-y-3">
+
+            {% for message in messages %}
+
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-5 py-4 text-sm shadow-sm">
+
+                <div class="flex items-center gap-3">
+
+                    {% if message.tags == "error" %}
+                        <i data-lucide="circle-x" class="h-5 w-5 text-red-600"></i>
+                    {% else %}
+                        <i data-lucide="check-circle-2" class="h-5 w-5 text-primary"></i>
+                    {% endif %}
+
+                    <span class="text-dark-green">
+                        {{ message }}
+                    </span>
+
+                </div>
+
+                <button
+                    type="button"
+                    data-dismiss-message
+                    class="text-text-muted hover:text-dark-green"
+                >
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ============================================ -->
+        <!-- SUMMARY CARDS -->
+        <!-- ============================================ -->
+
+        <div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+            <!-- TOTAL SALES -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Total Sales
+                    </span>
+
+                    <i data-lucide="shopping-bag" class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-dark-green">
+                    {{ total_sales }}
+                </p>
+
+            </div>
+
+
+            <!-- COMPLETED SALES -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Completed Sales
+                    </span>
+
+                    <i data-lucide="check-circle-2" class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-primary">
+                    {{ completed_sales }}
+                </p>
+
+            </div>
+
+
+            <!-- TOTAL REVENUE -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Total Revenue
+                    </span>
+
+                    <i data-lucide="pound-sterling" class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-primary">
+                    £{{ total_revenue|floatformat:2 }}
+                </p>
+
+            </div>
+
+
+            <!-- CANCELLED SALES -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Cancelled Sales
+                    </span>
+
+                    <i data-lucide="ban" class="h-5 w-5 text-red-500"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-red-600">
+                    {{ cancelled_sales }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================================ -->
+        <!-- SALES TABLE SECTION -->
+        <!-- ============================================ -->
+
+        <section class="rounded-2xl border border-border-light bg-white shadow-sm">
+
+            <!-- FILTER HEADER -->
+            <div class="border-b border-border-light p-5">
+
+                <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+
+                    <div>
+                        <h2 class="text-lg font-bold text-dark-green">
+                            {{ period_label }}
+                        </h2>
+
+                        <p class="mt-1 text-xs text-text-muted">
+                            Summary cards reflect the selected date range.
+                        </p>
+                    </div>
+
+                    {% if period == "today" %}
+
+                    <span class="rounded-full bg-soft-green px-3 py-1.5 text-xs font-semibold text-primary">
+                        {{ today }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ==================================== -->
+                <!-- FILTER FORM -->
+                <!-- ==================================== -->
+
+                <form
+                    method="get"
+                    id="sales-filter-form"
+                    class="flex flex-wrap items-end gap-3"
+                >
+
+                    <!-- SEARCH -->
+                    <div class="min-w-[180px] flex-1">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Search
+                        </label>
+
+                        <input
+                            type="search"
+                            name="search"
+                            value="{{ search }}"
+                            placeholder="Reference or customer..."
+                            class="h-12 w-full rounded-xl border border-border-light bg-white px-4 text-sm text-dark-green outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- DATE RANGE CUSTOM DROPDOWN -->
+                    <!-- ================================= -->
+
+                    <div class="w-full sm:w-44">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Date Range
+                        </label>
+
+                        <div class="relative" data-sales-dropdown>
+
+                            <input
+                                type="hidden"
+                                name="period"
+                                value="{{ period }}"
+                                data-dropdown-input
+                            >
+
+                            <button
+                                type="button"
+                                data-dropdown-trigger
+                                aria-expanded="false"
+                                class="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-4 text-left text-sm font-medium text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                            >
+
+                                <span data-dropdown-label>
+
+                                    {% if period == "date" %}
+                                        Select Date
+                                    {% elif period == "range" %}
+                                        Date Range
+                                    {% elif period == "all" %}
+                                        All Sales
+                                    {% else %}
+                                        Today
+                                    {% endif %}
+
+                                </span>
+
+                                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-text-muted"></i>
+
+                            </button>
+
+
+                            <!-- DROPDOWN MENU -->
+                            <div
+                                data-dropdown-menu
+                                class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-1.5 shadow-xl"
+                            >
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="today"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    Today
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="date"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    Select Date
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="range"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    Date Range
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="all"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    All Sales
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- SPECIFIC DATE -->
+                    <!-- ================================= -->
+
+                    <div
+                        id="sales-date-wrapper"
+                        class="w-full sm:w-44 {% if period != 'date' %}hidden{% endif %}"
+                    >
+
+                        <label
+                            for="sales-date"
+                            class="mb-2 block text-xs font-semibold text-text-muted"
+                        >
+                            Sale Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="sales-date"
+                            name="date"
+                            value="{{ selected_date|default:today }}"
+                            max="{{ today }}"
+                            class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- DATE RANGE: START DATE -->
+                    <!-- ================================= -->
+
+                    <div
+                        id="sales-range-start-wrapper"
+                        class="w-full sm:w-44 {% if period != 'range' %}hidden{% endif %}"
+                    >
+
+                        <label
+                            for="sales-start-date"
+                            class="mb-2 block text-xs font-semibold text-text-muted"
+                        >
+                            Start Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="sales-start-date"
+                            name="start_date"
+                            value="{{ start_date|default:today }}"
+                            max="{{ today }}"
+                            class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- DATE RANGE: END DATE -->
+                    <!-- ================================= -->
+
+                    <div
+                        id="sales-range-end-wrapper"
+                        class="w-full sm:w-44 {% if period != 'range' %}hidden{% endif %}"
+                    >
+
+                        <label
+                            for="sales-end-date"
+                            class="mb-2 block text-xs font-semibold text-text-muted"
+                        >
+                            End Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="sales-end-date"
+                            name="end_date"
+                            value="{{ end_date|default:today }}"
+                            max="{{ today }}"
+                            class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        >
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- STATUS CUSTOM DROPDOWN -->
+                    <!-- ================================= -->
+
+                    <div class="w-full sm:w-44">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Status
+                        </label>
+
+                        <div class="relative" data-sales-dropdown>
+
+                            <input
+                                type="hidden"
+                                name="status"
+                                value="{{ selected_status }}"
+                                data-dropdown-input
+                            >
+
+                            <button
+                                type="button"
+                                data-dropdown-trigger
+                                aria-expanded="false"
+                                class="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-4 text-left text-sm font-medium text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                            >
+
+                                <span data-dropdown-label>
+
+                                    {% if selected_status == "completed" %}
+                                        Completed
+                                    {% elif selected_status == "cancelled" %}
+                                        Cancelled
+                                    {% else %}
+                                        All Status
+                                    {% endif %}
+
+                                </span>
+
+                                <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-text-muted"></i>
+
+                            </button>
+
+
+                            <div
+                                data-dropdown-menu
+                                class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-1.5 shadow-xl"
+                            >
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value=""
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    All Status
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="completed"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    Completed
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-dropdown-option
+                                    data-value="cancelled"
+                                    class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green"
+                                >
+                                    Cancelled
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- APPLY BUTTON -->
+                    <!-- ================================= -->
+
+                    <button
+                        type="submit"
+                        class="h-12 rounded-xl bg-primary px-6 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                    >
+                        Apply
+                    </button>
+
+
+                    <!-- ================================= -->
+                    <!-- CLEAR BUTTON -->
+                    <!-- Only shown after filters applied -->
+                    <!-- ================================= -->
+
+                    {% if has_filters %}
+
+                    <a
+                        href="{% url 'sales:list' %}"
+                        class="inline-flex h-12 items-center gap-2 rounded-xl border border-border-light bg-white px-5 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+                    >
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                        Clear
+                    </a>
+
+                    {% endif %}
+
+                </form>
+
+            </div>
+
+
+            <!-- ============================================ -->
+            <!-- SALES TABLE -->
+            <!-- ============================================ -->
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full min-w-[850px] text-left">
+
+                    <thead class="bg-page-bg text-xs uppercase text-text-muted">
+
+                        <tr>
+                            <th class="px-5 py-4">Reference</th>
+                            <th class="px-5 py-4">Customer</th>
+                            <th class="px-5 py-4">Date</th>
+                            <th class="px-5 py-4">Total</th>
+                            <th class="px-5 py-4">Status</th>
+                            <th class="px-5 py-4 text-right">Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-border-light">
+
+                        {% for sale in sales %}
+
+                        <tr class="transition hover:bg-page-bg">
+
+                            <!-- REFERENCE -->
+                            <td class="px-5 py-4 text-sm font-semibold text-dark-green">
+                                {{ sale.reference }}
+                            </td>
+
+                            <!-- CUSTOMER -->
+                            <td class="px-5 py-4 text-sm text-dark-green">
+                                {{ sale.customer_name|default:"Walk-in Customer" }}
+                            </td>
+
+                            <!-- DATE -->
+                            <td class="px-5 py-4 text-sm text-text-muted">
+                                {{ sale.sale_date|date:"d M Y, h:i A" }}
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td class="px-5 py-4 text-sm font-semibold text-dark-green">
+                                £{{ sale.total|floatformat:2 }}
+                            </td>
+
+                            <!-- STATUS -->
+                            <td class="px-5 py-4">
+
+                                {% if sale.status == "completed" %}
+
+                                <span class="rounded-full bg-soft-green px-3 py-1 text-xs font-semibold text-primary">
+                                    Completed
+                                </span>
+
+                                {% else %}
+
+                                <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600">
+                                    Cancelled
+                                </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+                            <td class="px-5 py-4">
+
+                                <div class="flex items-center justify-end gap-1">
+
+                                    <!-- VIEW -->
+                                    <a
+                                        href="{% url 'sales:detail' sale.pk %}"
+                                        title="View Sale"
+                                        class="rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                    >
+                                        <i data-lucide="eye" class="h-4 w-4"></i>
+                                    </a>
+
+
+                                    <!-- RECEIPT -->
+                                    <a
+                                        href="{% url 'sales:receipt' sale.pk %}"
+                                        title="View Receipt"
+                                        class="rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary"
+                                    >
+                                        <i data-lucide="receipt" class="h-4 w-4"></i>
+                                    </a>
+
+
+                                    <!-- DELETE -->
+                                    {% if can_delete_sale %}
+                                    <button
+                                        type="button"
+                                        data-delete-sale
+                                        data-sale-id="{{ sale.pk }}"
+                                        data-sale-reference="{{ sale.reference }}"
+                                        data-sale-status="{{ sale.status }}"
+                                        data-delete-url="{% url 'sales:delete' sale.pk %}"
+                                        title="Delete Sale"
+                                        class="rounded-lg p-2 text-red-500 transition hover:bg-red-50 hover:text-red-600"
+                                    >
+                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                    </button>
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="6" class="px-5 py-14 text-center">
+
+                                <div class="flex flex-col items-center gap-3">
+
+                                    <i data-lucide="shopping-bag" class="h-9 w-9 text-text-muted"></i>
+
+                                    <p class="text-sm font-medium text-dark-green">
+                                        No sales found.
+                                    </p>
+
+                                    <p class="text-xs text-text-muted">
+                                        Change the date range or filters to view other sales.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- DELETE SALE MODAL -->
+{% if can_delete_sale %}
+<!-- ====================================================== -->
+
+<div
+    id="delete-sale-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-sale-modal-title"
+    aria-hidden="true"
+>
+
+    <div
+        class="w-full max-w-md rounded-2xl border border-border-light bg-white p-6 shadow-2xl sm:p-8"
+    >
+
+        <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+            <i data-lucide="trash-2" class="h-7 w-7 text-red-600"></i>
+        </div>
+
+        <h2
+            id="delete-sale-modal-title"
+            class="text-xl font-bold text-dark-green"
+        >
+            Delete Sale Permanently?
+        </h2>
+
+        <p class="mt-3 text-sm leading-6 text-text-muted">
+            Are you sure you want to delete
+            <span
+                id="delete-sale-reference"
+                class="font-semibold text-dark-green"
+            ></span>?
+        </p>
+
+        <p class="mt-2 text-sm leading-6 text-text-muted">
+            This sale and its items will be permanently deleted.
+            Stock will not be changed again because the sale is already cancelled.
+        </p>
+
+        <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+            <button
+                type="button"
+                id="close-delete-sale-modal"
+                class="rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+            >
+                Keep Sale
+            </button>
+
+            <form method="post" id="delete-sale-form">
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    id="confirm-delete-sale"
+                    class="w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                >
+                    Yes, Delete Sale
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ====================================================== -->
+<!-- CANCEL FIRST MODAL -->
+<!-- ====================================================== -->
+
+<div
+    id="cancel-first-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cancel-first-modal-title"
+    aria-hidden="true"
+>
+
+    <div
+        class="w-full max-w-md rounded-2xl border border-border-light bg-white p-6 shadow-2xl sm:p-8"
+    >
+
+        <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+            <i data-lucide="alert-triangle" class="h-7 w-7 text-amber-600"></i>
+        </div>
+
+        <h2
+            id="cancel-first-modal-title"
+            class="text-xl font-bold text-dark-green"
+        >
+            Cancel Sale First
+        </h2>
+
+        <p class="mt-3 text-sm leading-6 text-text-muted">
+            To delete this sale, please cancel it first.
+            Cancellation restores the sold products to inventory.
+        </p>
+
+        <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+            <button
+                type="button"
+                id="close-cancel-first-modal"
+                class="rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+            >
+                Close
+            </button>
+
+            <a
+                href="#"
+                id="cancel-first-view-sale"
+                class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                View Sale
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
+<!-- ====================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ====================================================== -->
+
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    "use strict";
+
+    // ==================================================
+    // CUSTOM DROPDOWNS
+    // ==================================================
+
+    const dropdowns = document.querySelectorAll(
+        "[data-sales-dropdown]"
+    );
+
+    function closeDropdowns(except = null) {
+
+        dropdowns.forEach(function (dropdown) {
+
+            if (dropdown === except) return;
+
+            const menu = dropdown.querySelector(
+                "[data-dropdown-menu]"
+            );
+
+            const trigger = dropdown.querySelector(
+                "[data-dropdown-trigger]"
+            );
+
+            if (menu) menu.classList.add("hidden");
+
+            if (trigger) {
+                trigger.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+            }
+
+        });
+    }
+
+
+    dropdowns.forEach(function (dropdown) {
+
+        const trigger = dropdown.querySelector(
+            "[data-dropdown-trigger]"
+        );
+
+        const menu = dropdown.querySelector(
+            "[data-dropdown-menu]"
+        );
+
+        const input = dropdown.querySelector(
+            "[data-dropdown-input]"
+        );
+
+        const label = dropdown.querySelector(
+            "[data-dropdown-label]"
+        );
+
+        if (!trigger || !menu || !input || !label) return;
+
+        trigger.addEventListener("click", function () {
+
+            const shouldOpen = menu.classList.contains("hidden");
+
+            closeDropdowns();
+
+            if (shouldOpen) {
+
+                menu.classList.remove("hidden");
+
+                trigger.setAttribute(
+                    "aria-expanded",
+                    "true"
+                );
+            }
+
+        });
+
+
+        menu.querySelectorAll("[data-dropdown-option]").forEach(
+            function (option) {
+
+                option.addEventListener("click", function () {
+
+                    input.value = option.dataset.value;
+
+                    label.textContent = option.textContent.trim();
+
+                    closeDropdowns();
+
+                    if (input.name === "period") {
+                        updateDateVisibility();
+                    }
+
+                });
+
+            }
+        );
+
+    });
+
+
+    // ==================================================
+    // DATE FILTERS
+    // ==================================================
+
+    const periodInput = document.querySelector(
+        'input[name="period"]'
+    );
+
+    const dateWrapper = document.getElementById(
+        "sales-date-wrapper"
+    );
+
+    const rangeStartWrapper = document.getElementById(
+        "sales-range-start-wrapper"
+    );
+
+    const rangeEndWrapper = document.getElementById(
+        "sales-range-end-wrapper"
+    );
+
+    const dateInput = document.getElementById(
+        "sales-date"
+    );
+
+    const startInput = document.getElementById(
+        "sales-start-date"
+    );
+
+    const endInput = document.getElementById(
+        "sales-end-date"
+    );
+
+    const today = "{{ today }}";
+
+    function updateDateVisibility() {
+
+        if (!periodInput) return;
+
+        const period = periodInput.value;
+
+        const showDate = period === "date";
+        const showRange = period === "range";
+
+        dateWrapper.classList.toggle(
+            "hidden",
+            !showDate
+        );
+
+        rangeStartWrapper.classList.toggle(
+            "hidden",
+            !showRange
+        );
+
+        rangeEndWrapper.classList.toggle(
+            "hidden",
+            !showRange
+        );
+
+        if (showDate && !dateInput.value) {
+            dateInput.value = today;
+        }
+
+        if (showRange) {
+
+            if (!startInput.value) {
+                startInput.value = today;
+            }
+
+            if (!endInput.value) {
+                endInput.value = today;
+            }
+
+        }
+
+        dateInput.required = showDate;
+        startInput.required = showRange;
+        endInput.required = showRange;
+
+        dateInput.max = today;
+        startInput.max = today;
+        endInput.max = today;
+
+        updateRangeLimits();
+    }
+
+
+    function updateRangeLimits() {
+
+        if (!startInput || !endInput) return;
+
+        if (!startInput.value) return;
+
+        endInput.min = startInput.value;
+
+        if (
+            endInput.value &&
+            endInput.value < startInput.value
+        ) {
+            endInput.value = startInput.value;
+        }
+    }
+
+
+    if (startInput) {
+
+        startInput.addEventListener(
+            "change",
+            updateRangeLimits
+        );
+
+    }
+
+
+    if (endInput) {
+
+        endInput.addEventListener(
+            "change",
+            function () {
+
+                if (
+                    startInput.value &&
+                    endInput.value < startInput.value
+                ) {
+                    endInput.value = startInput.value;
+                }
+
+            }
+        );
+
+    }
+
+    updateDateVisibility();
+
+
+    // ==================================================
+    // MODAL ELEMENTS
+    // ==================================================
+
+    const deleteModal = document.getElementById(
+        "delete-sale-modal"
+    );
+
+    const cancelFirstModal = document.getElementById(
+        "cancel-first-modal"
+    );
+
+    const deleteForm = document.getElementById(
+        "delete-sale-form"
+    );
+
+    const deleteReference = document.getElementById(
+        "delete-sale-reference"
+    );
+
+    const confirmDeleteButton = document.getElementById(
+        "confirm-delete-sale"
+    );
+
+    const cancelFirstView = document.getElementById(
+        "cancel-first-view-sale"
+    );
+
+    let activeModal = null;
+    let previousFocus = null;
+
+
+    function openModal(modal) {
+
+        closeDropdowns();
+
+        previousFocus = document.activeElement;
+
+        activeModal = modal;
+
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+        document.body.classList.add(
+            "overflow-hidden"
+        );
+
+        const firstButton = modal.querySelector(
+            'button[type="button"]'
+        );
+
+        if (firstButton) {
+            firstButton.focus();
+        }
+    }
+
+
+    function closeModal() {
+
+        if (!activeModal) return;
+
+        activeModal.classList.add("hidden");
+        activeModal.classList.remove("flex");
+
+        activeModal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+        document.body.classList.remove(
+            "overflow-hidden"
+        );
+
+        activeModal = null;
+
+        if (previousFocus) {
+            previousFocus.focus();
+        }
+    }
+
+
+    // ==================================================
+    // DELETE BUTTON HANDLING
+    // ==================================================
+
+    document.querySelectorAll(
+        "[data-delete-sale]"
+    ).forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const status = button.dataset.saleStatus;
+
+            const reference = button.dataset.saleReference;
+
+            if (status !== "cancelled") {
+
+                const viewLink = button.parentElement.querySelector(
+                    'a[title="View Sale"]'
+                );
+
+                cancelFirstView.href = viewLink
+                    ? viewLink.href
+                    : "#";
+
+                openModal(cancelFirstModal);
+
+                return;
+            }
+
+            deleteReference.textContent = reference;
+
+            deleteForm.action = button.dataset.deleteUrl;
+
+            openModal(deleteModal);
+
+        });
+
+    });
+
+
+    document.getElementById(
+        "close-delete-sale-modal"
+    ).addEventListener("click", closeModal);
+
+
+    document.getElementById(
+        "close-cancel-first-modal"
+    ).addEventListener("click", closeModal);
+
+
+    [deleteModal, cancelFirstModal].forEach(
+        function (modal) {
+
+            modal.addEventListener("click", function (event) {
+
+                if (event.target === modal) {
+                    closeModal();
+                }
+
+            });
+
+        }
+    );
+
+
+    // ==================================================
+    // OUTSIDE CLICK AND ESCAPE
+    // ==================================================
+
+    document.addEventListener("click", function (event) {
+
+        if (!event.target.closest("[data-sales-dropdown]")) {
+            closeDropdowns();
+        }
+
+    });
+
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+
+            closeDropdowns();
+            closeModal();
+
+        }
+
+        if (event.key === "Tab" && activeModal) {
+
+            const focusable = Array.from(
+                activeModal.querySelectorAll(
+                    'button:not([disabled]), a[href], input:not([disabled])'
+                )
+            ).filter(function (element) {
+                return element.getClientRects().length > 0;
+            });
+
+            if (!focusable.length) return;
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (
+                event.shiftKey &&
+                document.activeElement === first
+            ) {
+                event.preventDefault();
+                last.focus();
+            } else if (
+                !event.shiftKey &&
+                document.activeElement === last
+            ) {
+                event.preventDefault();
+                first.focus();
+            }
+
+        }
+
+    });
+
+
+    // ==================================================
+    // DELETE FORM SUBMISSION
+    // ==================================================
+
+    deleteForm.addEventListener("submit", function () {
+
+        confirmDeleteButton.disabled = true;
+
+        confirmDeleteButton.textContent = "Deleting...";
+
+        confirmDeleteButton.classList.add(
+            "cursor-not-allowed",
+            "opacity-60"
+        );
+
+    });
+
+
+    // ==================================================
+    // DISMISS MESSAGES
+    // ==================================================
+
+    document.querySelectorAll(
+        "[data-dismiss-message]"
+    ).forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const messageBox = button.closest(
+                ".rounded-xl"
+            );
+
+            if (messageBox) {
+                messageBox.remove();
+            }
+
+        });
+
+    });
+
+});
+</script>
+
+{% endblock %}

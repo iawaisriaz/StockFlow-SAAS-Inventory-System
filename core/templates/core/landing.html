@@ -1,0 +1,465 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}StockFlow | Inventory &amp; Sales Management{% endblock %}
+
+{% block meta_description %}Manage inventory, sales, purchases and staff with StockFlow.{% endblock %}
+
+{% block extra_css %}
+
+<link href="{% static 'css/landing.css' %}" rel="stylesheet"/>
+
+{% endblock %}
+
+{% block content %}
+
+<!-- ======= STOCKFLOW LANDING PAGE ======= -->
+<!-- Navigation -->
+<header class="sticky top-0 z-50 border-b border-border-light bg-white/95 backdrop-blur-md">
+ <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+  <a aria-label="StockFlow home" class="flex items-center gap-3" href="{% url 'landing' %}">
+   <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-dark-green text-white">
+    <i class="h-6 w-6" data-lucide="boxes">
+    </i>
+   </span>
+   <span class="text-2xl font-extrabold tracking-tight text-dark-green">
+    Stock
+    <span class="text-primary">
+     Flow
+    </span>
+   </span>
+  </a>
+  <div class="hidden items-center gap-9 lg:flex">
+   <a class="text-sm font-semibold text-primary" href="#home">
+    Home
+   </a>
+   <a class="text-sm font-medium text-text-muted hover:text-primary" href="#features">
+    Features
+   </a>
+   <a class="text-sm font-medium text-text-muted hover:text-primary" href="#solutions">
+    Solutions
+   </a>
+   <a class="text-sm font-medium text-text-muted hover:text-primary" href="#how-it-works">
+    How It Works
+   </a>
+  </div>
+  <div class="hidden items-center gap-4 lg:flex">
+   <a class="text-sm font-semibold text-dark-green hover:text-primary" href="{% url 'login' %}">
+    Log In
+   </a>
+   <a class="btn-primary" href="{% url 'signup' %}">
+    Sign up
+   </a>
+  </div>
+  <button aria-controls="mobile-menu" aria-expanded="false" aria-label="Open navigation menu" class="flex h-10 w-10 items-center justify-center rounded-lg border border-border-light text-dark-green lg:hidden" id="menu-toggle" type="button">
+   <i class="h-5 w-5" data-lucide="menu">
+   </i>
+  </button>
+ </nav>
+ <!-- Mobile Navigation -->
+ <div aria-hidden="true" class="mobile-menu absolute left-0 right-0 top-full border-b border-border-light bg-white px-5 py-5 shadow-lg lg:hidden" id="mobile-menu" inert="">
+  <div class="flex flex-col gap-4">
+   <a class="font-medium text-text-main" href="#home">
+    Home
+   </a>
+   <a class="font-medium text-text-main" href="#features">
+    Features
+   </a>
+   <a class="font-medium text-text-main" href="#solutions">
+    Solutions
+   </a>
+   <a class="font-medium text-text-main" href="#how-it-works">
+    How It Works
+   </a>
+   <div class="mt-2 space-y-3 border-t border-border-light pt-4">
+    <a class="block rounded-lg border border-border-light px-4 py-3 text-center text-sm font-semibold text-dark-green" href="{% url 'login' %}">
+     Log In
+    </a>
+    <a class="block rounded-lg bg-primary px-4 py-3 text-center text-sm font-semibold text-white" href="{% url 'signup' %}">
+     Sign up
+    </a>
+   </div>
+  </div>
+ </div>
+</header>
+<!-- ======= HERO SECTION ======= -->
+<section class="hero-pattern overflow-hidden bg-white" id="home">
+ <div class="mx-auto grid max-w-[1500px] items-center gap-6 px-5 pb-20 pt-16 lg:grid-cols-[45%_55%] lg:pl-20 lg:pr-8 lg:pb-28 lg:pt-24">
+  <!-- Hero Content -->
+  <div class="max-w-xl lg:translate-x-8">
+   <div class="mb-7 inline-flex items-center gap-2 rounded-full border border-green-100 bg-soft-green px-4 py-2 text-xs font-semibold text-primary">
+    <span class="h-2 w-2 rounded-full bg-primary">
+    </span>
+    A smarter way to manage your business
+   </div>
+   <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-dark-green sm:text-5xl lg:text-[58px]">
+    Take Control of Your
+    <span class="text-primary">
+     Inventory &amp; Sales
+    </span>
+   </h1>
+   <p class="mt-6 max-w-lg text-base leading-8 text-text-muted sm:text-lg">
+    Manage your products, track sales, monitor stock levels and keep your business organized — all from one simple platform.
+   </p>
+   <!-- Hero Actions -->
+   <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+    <a class="btn-primary" href="{% url 'signup' %}">
+     Get Started Free
+     <i class="h-4 w-4" data-lucide="arrow-right">
+     </i>
+    </a>
+    <a class="btn-outline" href="#features">
+     Explore Features
+     <i class="h-4 w-4" data-lucide="arrow-up-right">
+     </i>
+    </a>
+   </div>
+   <div class="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-text-muted">
+    <span class="flex items-center gap-2">
+     <i class="h-4 w-4 text-primary" data-lucide="check-circle-2">
+     </i>
+     Easy to use
+    </span>
+    <span class="flex items-center gap-2">
+     <i class="h-4 w-4 text-primary" data-lucide="check-circle-2">
+     </i>
+     Real-time stock
+    </span>
+    <span class="flex items-center gap-2">
+     <i class="h-4 w-4 text-primary" data-lucide="check-circle-2">
+     </i>
+     Team management
+    </span>
+   </div>
+  </div>
+  <!-- ======= DASHBOARD PREVIEW IMAGE ======= -->
+  <div class="relative flex items-start justify-center lg:justify-end">
+   <img alt="StockFlow Inventory Management Dashboard" class="block h-auto w-full max-w-none object-contain" src="{% static 'images/dashboard-preview.png' %}"/>
+  </div>
+ </div>
+</section>
+<!-- ======= FEATURES SECTION ======= -->
+<section class="bg-page-bg py-20 lg:py-28" id="features">
+ <div class="mx-auto max-w-7xl px-5 lg:px-8">
+  <!-- Section Heading -->
+  <div class="mx-auto mb-14 max-w-2xl text-center">
+   <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
+    Powerful Features
+   </p>
+   <h2 class="text-3xl font-extrabold tracking-tight text-dark-green sm:text-4xl">
+    Everything You Need to Run Your Business
+   </h2>
+   <p class="mt-5 text-base leading-7 text-text-muted">
+    Keep your inventory, sales and team organized with practical tools designed for everyday operations.
+   </p>
+  </div>
+  <!-- Feature Cards -->
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="package-check">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Inventory Management
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Track quantities, stock movements and products running low.
+    </p>
+   </div>
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="shopping-bag">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Sales Tracking
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Record transactions and automatically update stock after confirmed sales.
+    </p>
+   </div>
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="layers-3">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Product Organization
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Organize products by category, brand and model.
+    </p>
+   </div>
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="truck">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Purchase Management
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Record supplier purchases and increase stock after confirmation.
+    </p>
+   </div>
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="chart-no-axes-combined">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Business Reports
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Review sales, purchase costs and gross profit.
+    </p>
+   </div>
+   <div class="feature-card rounded-2xl border border-border-light bg-white p-7">
+    <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-soft-green text-primary">
+     <i class="h-6 w-6" data-lucide="users-round">
+     </i>
+    </div>
+    <h3 class="mb-3 text-lg font-bold text-dark-green">
+     Staff Management
+    </h3>
+    <p class="text-sm leading-7 text-text-muted">
+     Create employee accounts with role-based permissions.
+    </p>
+   </div>
+  </div>
+ </div>
+</section>
+<!-- ======= SOLUTIONS SECTION ======= -->
+<section class="bg-white py-20 lg:py-28" id="solutions">
+ <div class="mx-auto max-w-7xl px-5 lg:px-8">
+  <!-- Section Heading -->
+  <div class="mx-auto mb-14 max-w-2xl text-center">
+   <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
+    Built for Businesses
+   </p>
+   <h2 class="text-3xl font-extrabold tracking-tight text-dark-green sm:text-4xl">
+    One Platform, Different Businesses
+   </h2>
+   <p class="mt-5 text-base leading-7 text-text-muted">
+    StockFlow can help different types of retail businesses stay organized.
+   </p>
+  </div>
+  <!-- Business Categories -->
+  <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+   <div class="industry-card rounded-2xl border border-border-light bg-page-bg p-7 text-center">
+    <span class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-soft-green text-primary">
+     <i class="h-8 w-8" data-lucide="smartphone">
+     </i>
+    </span>
+    <h3 class="font-bold text-dark-green">
+     Mobile Shops
+    </h3>
+    <p class="mt-2 text-sm text-text-muted">
+     Phones and accessories
+    </p>
+   </div>
+   <div class="industry-card rounded-2xl border border-border-light bg-page-bg p-7 text-center">
+    <span class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-soft-green text-primary">
+     <i class="h-8 w-8" data-lucide="monitor">
+     </i>
+    </span>
+    <h3 class="font-bold text-dark-green">
+     Electronics
+    </h3>
+    <p class="mt-2 text-sm text-text-muted">
+     Devices and equipment
+    </p>
+   </div>
+   <div class="industry-card rounded-2xl border border-border-light bg-page-bg p-7 text-center">
+    <span class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-soft-green text-primary">
+     <i class="h-8 w-8" data-lucide="shirt">
+     </i>
+    </span>
+    <h3 class="font-bold text-dark-green">
+     Clothing Stores
+    </h3>
+    <p class="mt-2 text-sm text-text-muted">
+     Fashion and apparel
+    </p>
+   </div>
+   <div class="industry-card rounded-2xl border border-border-light bg-page-bg p-7 text-center">
+    <span class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-soft-green text-primary">
+     <i class="h-8 w-8" data-lucide="store">
+     </i>
+    </span>
+    <h3 class="font-bold text-dark-green">
+     Retail Stores
+    </h3>
+    <p class="mt-2 text-sm text-text-muted">
+     Everyday retail products
+    </p>
+   </div>
+  </div>
+ </div>
+</section>
+<!-- ======= HOW IT WORKS SECTION ======= -->
+<section class="bg-page-bg py-20 lg:py-28" id="how-it-works">
+ <div class="mx-auto max-w-7xl px-5 lg:px-8">
+  <!-- Section Heading -->
+  <div class="mx-auto mb-14 max-w-2xl text-center">
+   <p class="mb-3 text-sm font-bold uppercase tracking-widest text-primary">
+    Simple Setup
+   </p>
+   <h2 class="text-3xl font-extrabold tracking-tight text-dark-green sm:text-4xl">
+    Get Started in Three Simple Steps
+   </h2>
+   <p class="mt-5 text-base leading-7 text-text-muted">
+    Set up your business and start managing inventory without unnecessary complexity.
+   </p>
+  </div>
+  <!-- Steps -->
+  <div class="grid gap-8 md:grid-cols-3">
+   <div class="text-center">
+    <span class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-dark-green text-white">
+     <i class="h-7 w-7" data-lucide="user-plus">
+     </i>
+    </span>
+    <span class="text-xs font-bold uppercase tracking-widest text-primary">
+     Step 01
+    </span>
+    <h3 class="mb-3 mt-3 text-xl font-bold text-dark-green">
+     Create Your Account
+    </h3>
+    <p class="mx-auto max-w-xs text-sm leading-7 text-text-muted">
+     Sign up as an owner and set up your business profile.
+    </p>
+   </div>
+   <div class="text-center">
+    <span class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-dark-green text-white">
+     <i class="h-7 w-7" data-lucide="package-plus">
+     </i>
+    </span>
+    <span class="text-xs font-bold uppercase tracking-widest text-primary">
+     Step 02
+    </span>
+    <h3 class="mb-3 mt-3 text-xl font-bold text-dark-green">
+     Add Your Products
+    </h3>
+    <p class="mx-auto max-w-xs text-sm leading-7 text-text-muted">
+     Create categories, brands and your product catalog.
+    </p>
+   </div>
+   <div class="text-center">
+    <span class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-dark-green text-white">
+     <i class="h-7 w-7" data-lucide="chart-column-increasing">
+     </i>
+    </span>
+    <span class="text-xs font-bold uppercase tracking-widest text-primary">
+     Step 03
+    </span>
+    <h3 class="mb-3 mt-3 text-xl font-bold text-dark-green">
+     Manage &amp; Grow
+    </h3>
+    <p class="mx-auto max-w-xs text-sm leading-7 text-text-muted">
+     Record purchases, track sales and review performance.
+    </p>
+   </div>
+  </div>
+ </div>
+</section>
+<!-- ======= CALL TO ACTION SECTION ======= -->
+<section class="bg-white px-5 py-20 lg:px-8">
+ <div class="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-dark-green px-6 py-16 text-center sm:px-12 lg:py-20">
+  <div class="mx-auto max-w-2xl">
+   <span class="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-white">
+    <i class="h-7 w-7" data-lucide="rocket">
+    </i>
+   </span>
+   <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+    Ready to Simplify Your Business?
+   </h2>
+   <p class="mx-auto mt-5 max-w-xl text-base leading-8 text-green-100/80">
+    Bring your products, inventory and sales together in one organized workspace.
+   </p>
+   <a class="mt-9 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-8 py-4 text-sm font-bold text-dark-green transition hover:bg-soft-green" href="{% url 'signup' %}">
+    Get Started Free
+    <i class="h-4 w-4" data-lucide="arrow-right">
+    </i>
+   </a>
+  </div>
+ </div>
+</section>
+<!-- ======= FOOTER SECTION ======= -->
+<footer class="border-t border-border-light bg-page-bg">
+ <div class="mx-auto max-w-7xl px-5 pb-10 pt-16 lg:px-8">
+  <div class="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
+   <!-- Brand -->
+   <div class="lg:col-span-2">
+    <a class="inline-flex items-center gap-3" href="{% url 'landing' %}">
+     <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-dark-green text-white">
+      <i class="h-6 w-6" data-lucide="boxes">
+      </i>
+     </span>
+     <span class="text-2xl font-extrabold tracking-tight text-dark-green">
+      Stock
+      <span class="text-primary">
+       Flow
+      </span>
+     </span>
+    </a>
+    <p class="mt-5 max-w-sm text-sm leading-7 text-text-muted">
+     A modern inventory and sales management platform for everyday business operations.
+    </p>
+   </div>
+   <!-- Product Links -->
+   <div>
+    <h3 class="mb-5 text-sm font-bold text-dark-green">
+     Product
+    </h3>
+    <div class="flex flex-col gap-3 text-sm text-text-muted">
+     <a class="hover:text-primary" href="#features">
+      Features
+     </a>
+     <a class="hover:text-primary" href="#solutions">
+      Solutions
+     </a>
+     <a class="hover:text-primary" href="#how-it-works">
+      How It Works
+     </a>
+    </div>
+   </div>
+   <!-- Account Links -->
+   <div>
+    <h3 class="mb-5 text-sm font-bold text-dark-green">
+     Account
+    </h3>
+    <div class="flex flex-col gap-3 text-sm text-text-muted">
+     <a class="hover:text-primary" href="{% url 'login' %}">
+      Log In
+     </a>
+     <a class="hover:text-primary" href="{% url 'signup' %}">
+      Create Account
+     </a>
+    </div>
+   </div>
+  </div>
+  <!-- Footer Bottom -->
+  <div class="mt-14 flex flex-col items-center justify-between gap-4 border-t border-border-light pt-7 text-center text-sm text-text-muted sm:flex-row sm:text-left">
+   <p>
+    © {% now "Y" %} StockFlow. All rights reserved.
+   </p>
+   <p>
+    Inventory &amp; Sales Management System
+   </p>
+  </div>
+ </div>
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<!-- ======= LANDING PAGE SCRIPTS ======= -->
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js">
+</script>
+<script src="{% static 'js/landing.js' %}">
+</script>
+
+{% endblock %}

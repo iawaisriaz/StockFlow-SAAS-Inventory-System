@@ -1,0 +1,145 @@
+<!-- ADD / EDIT CATEGORY MODAL -->
+<dialog
+    id="category-modal"
+    class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-black/50"
+>
+
+    <!-- MODAL HEADER -->
+    <div class="flex items-start justify-between gap-4 border-b border-border-light px-6 py-5">
+
+        <div>
+
+            <h2
+                id="category-modal-title"
+                class="text-xl font-bold text-dark-green"
+            >
+                Add New Category
+            </h2>
+
+            <p class="mt-1 text-sm text-text-muted">
+                Enter category details below.
+            </p>
+
+        </div>
+
+        <!-- CLOSE BUTTON -->
+        <button
+            type="button"
+            data-close-dialog="category-modal"
+            class="rounded-lg p-2 text-text-muted transition hover:bg-page-bg"
+        >
+
+            <i
+                data-lucide="x"
+                class="h-5 w-5"
+            ></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- CATEGORY FORM -->
+    <form
+        id="category-form"
+        method="post"
+        action="{% url 'categories:add' %}"
+        data-add-url="{% url 'categories:add' %}"
+    >
+
+        {% csrf_token %}
+
+        <div class="space-y-5 px-6 py-6">
+
+            <!-- CATEGORY NAME -->
+            <div>
+
+                <label
+                    for="category-name"
+                    class="mb-2 block text-sm font-semibold text-dark-green"
+                >
+                    Category Name
+                    <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    id="category-name"
+                    name="name"
+                    maxlength="100"
+                    required
+                    placeholder="e.g. Mobile Chargers"
+                    class="w-full rounded-xl border border-border-light bg-white px-4 py-3 text-sm text-text-main outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                >
+
+                <p class="mt-2 text-xs text-text-muted">
+                    Enter a unique name for this category.
+                </p>
+
+            </div>
+
+
+            <!-- CATEGORY DESCRIPTION -->
+            <div>
+
+                <label
+                    for="category-description"
+                    class="mb-2 block text-sm font-semibold text-dark-green"
+                >
+                    Description
+
+                    <span class="font-normal text-text-muted">
+                        (Optional)
+                    </span>
+
+                </label>
+
+                <textarea
+                    id="category-description"
+                    name="description"
+                    rows="4"
+                    maxlength="500"
+                    placeholder="Write a short category description..."
+                    class="w-full resize-none rounded-xl border border-border-light bg-white px-4 py-3 text-sm text-text-main outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <!-- MODAL FOOTER -->
+        <div class="flex justify-end gap-3 border-t border-border-light px-6 py-4">
+
+            <!-- CANCEL -->
+            <button
+                type="button"
+                data-close-dialog="category-modal"
+                class="rounded-xl border border-border-light px-5 py-2.5 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+            >
+                Cancel
+            </button>
+
+            <!-- SAVE -->
+            <button
+                type="submit"
+                id="category-submit"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+
+                <i
+                    data-lucide="check"
+                    class="h-4 w-4"
+                ></i>
+
+                <span id="category-submit-text">
+                    Save Category
+                </span>
+
+            </button>
+
+        </div>
+
+    </form>
+
+</dialog>

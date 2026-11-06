@@ -1,0 +1,555 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- ================================================== -->
+<!-- SIDEBAR -->
+<!-- ================================================== -->
+
+{% include "partials/navbar.html" %}
+
+
+<!-- ================================================== -->
+<!-- MAIN LAYOUT -->
+<!-- ================================================== -->
+
+<div id="app-layout" class="min-h-screen bg-page-bg lg:ml-64">
+
+    <!-- HEADER -->
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- ========================================== -->
+        <!-- PAGE HEADER -->
+        <!-- ========================================== -->
+
+        <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+
+            <div>
+                <h1 class="text-3xl font-bold text-dark-green">
+                    Sale Details
+                </h1>
+
+                <p class="mt-1 text-sm text-text-muted">
+                    View transaction details for
+                    {{ sale.reference }}.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'sales:list' %}"
+                class="inline-flex items-center gap-2 rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+            >
+                <i data-lucide="arrow-left" class="h-4 w-4"></i>
+                Back to Sales
+            </a>
+
+        </div>
+
+
+        <!-- ========================================== -->
+        <!-- DJANGO MESSAGES -->
+        <!-- ========================================== -->
+
+        {% if messages %}
+
+            <div class="mb-6 space-y-3">
+
+                {% for message in messages %}
+
+                    <div class="flex items-start gap-3 rounded-xl border border-border-light bg-white px-5 py-4 text-sm text-dark-green shadow-sm">
+
+                        {% if message.tags == "success" %}
+                            <i data-lucide="check-circle-2" class="h-5 w-5 shrink-0 text-green-600"></i>
+                        {% elif message.tags == "error" %}
+                            <i data-lucide="circle-x" class="h-5 w-5 shrink-0 text-red-600"></i>
+                        {% else %}
+                            <i data-lucide="info" class="h-5 w-5 shrink-0 text-primary"></i>
+                        {% endif %}
+
+                        <span>{{ message }}</span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ========================================== -->
+        <!-- SALE INFORMATION -->
+        <!-- ========================================== -->
+
+        <section class="mb-6 rounded-2xl border border-border-light bg-white p-6 shadow-sm">
+
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+
+                <div class="flex items-center gap-3">
+
+                    <i data-lucide="file-text" class="h-5 w-5 text-primary"></i>
+
+                    <h2 class="text-lg font-bold text-dark-green">
+                        Sale Information
+                    </h2>
+
+                </div>
+
+                {% if sale.status == "completed" %}
+
+                    <span class="inline-flex items-center gap-2 rounded-full bg-soft-green px-4 py-2 text-xs font-semibold text-primary">
+                        <span class="h-2 w-2 rounded-full bg-primary"></span>
+                        Completed
+                    </span>
+
+                {% else %}
+
+                    <span class="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-xs font-semibold text-red-600">
+                        <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                        Cancelled
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- INFORMATION GRID -->
+
+            <div class="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 xl:grid-cols-3">
+
+                <!-- REFERENCE -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Sale Reference
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.reference }}
+                    </p>
+                </div>
+
+                <!-- DATE -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Sale Date
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.sale_date|date:"d M Y, h:i A" }}
+                    </p>
+                </div>
+
+                <!-- CUSTOMER -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Customer
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.customer_name|default:"Walk-in Customer" }}
+                    </p>
+                </div>
+
+                <!-- PHONE -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Phone Number
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.customer_phone|default:"Not provided" }}
+                    </p>
+                </div>
+
+                <!-- PAYMENT METHOD -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Payment Method
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.get_payment_method_display }}
+                    </p>
+                </div>
+
+                <!-- CREATED BY -->
+                <div>
+                    <p class="text-sm text-text-muted">
+                        Created By
+                    </p>
+
+                    <p class="mt-2 text-sm font-semibold text-dark-green">
+                        {{ sale.created_by.username }}
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- CANCELLED INFORMATION -->
+
+            {% if sale.status == "cancelled" and sale.cancelled_at %}
+
+                <div class="mt-7 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4">
+
+                    <i data-lucide="info" class="mt-0.5 h-5 w-5 shrink-0 text-red-600"></i>
+
+                    <p class="text-sm text-red-700">
+                        This sale was cancelled on
+                        <span class="font-semibold">
+                            {{ sale.cancelled_at|date:"d M Y, h:i A" }}
+                        </span>.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- PRODUCTS SOLD -->
+        <!-- ========================================== -->
+
+        <section class="mb-6 overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+            <div class="flex items-center gap-3 border-b border-border-light px-6 py-5">
+
+                <i data-lucide="package" class="h-5 w-5 text-primary"></i>
+
+                <h2 class="text-lg font-bold text-dark-green">
+                    Products Sold
+                </h2>
+
+            </div>
+
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full min-w-[650px] text-left">
+
+                    <thead class="bg-page-bg">
+
+                        <tr class="text-xs font-semibold uppercase tracking-wide text-text-muted">
+
+                            <th class="px-6 py-4">
+                                Product
+                            </th>
+
+                            <th class="px-6 py-4">
+                                Quantity
+                            </th>
+
+                            <th class="px-6 py-4">
+                                Unit Price
+                            </th>
+
+                            <th class="px-6 py-4 text-right">
+                                Line Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody class="divide-y divide-border-light">
+
+                        {% for item in sale.items.all %}
+
+                            <tr class="transition hover:bg-page-bg">
+
+                                <!-- PRODUCT -->
+                                <td class="px-6 py-5">
+
+                                    <p class="text-sm font-semibold text-dark-green">
+                                        {{ item.product_name }}
+                                    </p>
+
+                                </td>
+
+                                <!-- QUANTITY -->
+                                <td class="px-6 py-5 text-sm text-dark-green">
+                                    {{ item.quantity }}
+                                </td>
+
+                                <!-- UNIT PRICE -->
+                                <td class="px-6 py-5 text-sm text-dark-green">
+                                    £{{ item.unit_price|floatformat:2 }}
+                                </td>
+
+                                <!-- LINE TOTAL -->
+                                <td class="px-6 py-5 text-right text-sm font-semibold text-dark-green">
+                                    £{{ item.line_total|floatformat:2 }}
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    class="px-6 py-12 text-center text-sm text-text-muted"
+                                >
+                                    No products found for this sale.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- PAYMENT SUMMARY -->
+        <!-- ========================================== -->
+
+        <section class="mb-6 rounded-2xl border border-border-light bg-white p-6 shadow-sm">
+
+            <div class="mb-6 flex items-center gap-3">
+
+                <i data-lucide="wallet" class="h-5 w-5 text-primary"></i>
+
+                <h2 class="text-lg font-bold text-dark-green">
+                    Payment Summary
+                </h2>
+
+            </div>
+
+
+            <div class="ml-auto max-w-md space-y-4">
+
+                <!-- SUBTOTAL -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <span class="text-sm text-text-muted">
+                        Subtotal
+                    </span>
+
+                    <span class="text-sm font-semibold text-dark-green">
+                        £{{ sale.subtotal|floatformat:2 }}
+                    </span>
+
+                </div>
+
+                <!-- DISCOUNT -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <span class="text-sm text-text-muted">
+                        Discount
+                    </span>
+
+                    <span class="text-sm font-semibold text-dark-green">
+                        £{{ sale.discount|floatformat:2 }}
+                    </span>
+
+                </div>
+
+
+                <div class="border-t border-border-light"></div>
+
+
+                <!-- GRAND TOTAL -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <span class="text-base font-bold text-dark-green">
+                        Grand Total
+                    </span>
+
+                    <span class="text-2xl font-bold text-primary">
+                        £{{ sale.total|floatformat:2 }}
+                    </span>
+
+                </div>
+
+
+                <div class="border-t border-border-light"></div>
+
+
+                <!-- RECEIVED -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <span class="text-sm text-text-muted">
+                        Amount Received
+                    </span>
+
+                    <span class="text-sm font-semibold text-dark-green">
+                        £{{ sale.amount_received|floatformat:2 }}
+                    </span>
+
+                </div>
+
+                <!-- CHANGE -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <span class="text-sm text-text-muted">
+                        Change
+                    </span>
+
+                    <span class="text-sm font-semibold text-dark-green">
+                        £{{ sale.change_amount|floatformat:2 }}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- ACTION BUTTONS -->
+        <!-- ========================================== -->
+
+        <div class="flex flex-wrap justify-end gap-3">
+
+            <!-- RECEIPT -->
+            <a
+                href="{% url 'sales:receipt' sale.pk %}"
+                class="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+            >
+                <i data-lucide="receipt" class="h-4 w-4"></i>
+                View Receipt
+            </a>
+
+
+            <!-- CANCEL SALE -->
+            {% if sale.status == "completed" and can_cancel_sale %}
+
+                <button
+                    type="button"
+                    id="open-cancel-sale-modal"
+                    class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-6 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                >
+                    <i data-lucide="ban" class="h-4 w-4"></i>
+                    Cancel Sale
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ================================================== -->
+<!-- CUSTOM CANCEL SALE MODAL -->
+<!-- ================================================== -->
+
+{% if sale.status == "completed" and can_cancel_sale %}
+
+<div
+    id="cancel-sale-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cancel-sale-modal-title"
+>
+
+    <!-- MODAL PANEL -->
+    <div
+        id="cancel-sale-modal-panel"
+        class="w-full max-w-md rounded-2xl border border-border-light bg-white p-6 shadow-2xl sm:p-8"
+    >
+
+        <!-- WARNING ICON -->
+        <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+
+            <i
+                data-lucide="alert-triangle"
+                class="h-7 w-7 text-red-600"
+            ></i>
+
+        </div>
+
+
+        <!-- TITLE -->
+        <h2
+            id="cancel-sale-modal-title"
+            class="text-xl font-bold text-dark-green"
+        >
+            Cancel This Sale?
+        </h2>
+
+
+        <!-- DESCRIPTION -->
+        <p class="mt-3 text-sm leading-6 text-text-muted">
+            Are you sure you want to cancel sale
+            <span class="font-semibold text-dark-green">
+                {{ sale.reference }}
+            </span>?
+        </p>
+
+        <p class="mt-2 text-sm leading-6 text-text-muted">
+            This action will mark the sale as cancelled
+            and restore the sold products to inventory.
+        </p>
+
+
+        <!-- MODAL ACTIONS -->
+        <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+            <!-- KEEP SALE -->
+            <button
+                type="button"
+                id="close-cancel-sale-modal"
+                class="rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green transition hover:bg-page-bg"
+            >
+                Keep Sale
+            </button>
+
+
+            <!-- CONFIRM CANCEL -->
+            <form
+                method="post"
+                action="{% url 'sales:cancel' sale.pk %}"
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    id="confirm-cancel-sale"
+                    class="w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                >
+                    Yes, Cancel Sale
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+
+<!-- ================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ================================================== -->
+
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+<script src="{% static 'js/sales_delete.js' %}" defer></script>
+
+
+{% endblock %}

@@ -1,0 +1,1031 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- ====== SIDEBAR ====== -->
+
+{% include "partials/navbar.html" %}
+
+
+<!-- ===================================== -->
+<!-- DASHBOARD LAYOUT -->
+<!-- ===================================== -->
+
+<div
+    id="app-layout"
+    class="min-h-screen bg-[#F8FAF9] lg:ml-64"
+>
+
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+
+        <!-- ===================================== -->
+        <!-- PAGE TITLE -->
+        <!-- ===================================== -->
+
+        <div class="mb-6">
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-[#123C32]">
+                Settings
+            </h1>
+
+            <p class="mt-1 text-sm text-[#64746D]">
+                Manage your account and business information.
+            </p>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MAIN TWO-COLUMN GRID -->
+        <!-- ===================================== -->
+
+        <div class="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-5">
+
+
+            <!-- ===================================== -->
+            <!-- LEFT: PERSONAL + BUSINESS -->
+            <!-- ===================================== -->
+
+            <section
+                class="flex min-w-0 flex-col overflow-hidden rounded-xl border border-[#E1EAE5] bg-white shadow-sm xl:col-span-3"
+            >
+
+                <!-- CARD HEADER -->
+
+                <div class="flex items-center gap-4 border-b border-[#E1EAE5] px-5 py-5 sm:px-6">
+
+                    <div
+                        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#E4F4ED] text-[#007F5F]"
+                    >
+                        <i data-lucide="user-round" class="h-7 w-7"></i>
+                    </div>
+
+                    <div class="min-w-0">
+
+                        <h2 class="text-lg font-bold text-[#123C32]">
+                            Personal &amp; Business Information
+                        </h2>
+
+                        <p class="mt-1 text-xs text-[#64746D]">
+                            Update your profile and business details.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMBINED FORM -->
+
+                <form
+                    id="information-form"
+                    method="post"
+                    action="{% url 'settings' %}"
+                    enctype="multipart/form-data"
+                    class="flex flex-1 flex-col px-5 py-5 sm:px-6"
+                >
+
+                    {% csrf_token %}
+
+                    <input
+                        type="hidden"
+                        name="action"
+                        value="information"
+                    >
+
+
+                    <!-- ===================================== -->
+                    <!-- PERSONAL INFORMATION -->
+                    <!-- ===================================== -->
+
+                    <div>
+
+                        <h3 class="mb-4 text-base font-bold text-[#123C32]">
+                            Personal Information
+                        </h3>
+
+
+                        <!-- PROFILE PHOTO -->
+
+                        <div class="mb-5 flex flex-wrap items-center gap-4">
+
+                            <div
+                                id="personal-photo-preview"
+                                data-fallback="{{ request.user.username|first|upper }}"
+                                class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E7EDF1] text-3xl font-semibold text-[#728390]"
+                            >
+
+                                {% if request.user.profile_photo %}
+
+                                <img
+                                    src="{{ request.user.profile_photo.url }}"
+                                    alt="Profile photo"
+                                    class="h-full w-full object-cover"
+                                >
+
+                                {% else %}
+
+                                <span>
+                                    {{ request.user.username|first|upper }}
+                                </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="min-w-0 flex-1">
+
+                                <div class="flex flex-wrap items-center gap-2">
+
+                                    <label
+                                        for="id_personal-profile_photo"
+                                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#D4E0DA] bg-white px-4 py-2.5 text-xs font-semibold text-[#123C32] transition hover:bg-[#F1F8F4]"
+                                    >
+
+                                        <i data-lucide="upload" class="h-4 w-4"></i>
+
+                                        Upload Profile Photo
+
+                                    </label>
+
+
+                                    <input
+                                        id="id_personal-profile_photo"
+                                        name="personal-profile_photo"
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        class="sr-only"
+                                    >
+
+
+                                    <input
+                                        id="personal-photo-clear"
+                                        name="personal-profile_photo-clear"
+                                        type="checkbox"
+                                        class="hidden"
+                                    >
+
+
+                                    <button
+                                        type="button"
+                                        data-remove-image="personal"
+                                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100"
+                                        {% if not request.user.profile_photo %}hidden{% endif %}
+                                    >
+
+                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+
+                                        Remove
+
+                                    </button>
+
+                                </div>
+
+
+                                <p
+                                    id="personal-photo-status"
+                                    class="mt-2 text-xs text-[#64746D]"
+                                    aria-live="polite"
+                                >
+                                    JPG, PNG or WebP, maximum 10 MB.
+                                </p>
+
+
+                                {% for error in personal_form.profile_photo.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PERSONAL FIELDS -->
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+
+                            <!-- FIRST NAME -->
+
+                            <div>
+
+                                <label
+                                    for="id_personal-first_name"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    First Name
+                                </label>
+
+                                <input
+                                    id="id_personal-first_name"
+                                    type="text"
+                                    name="personal-first_name"
+                                    value="{{ personal_form.first_name.value|default_if_none:'' }}"
+                                    autocomplete="given-name"
+                                    placeholder="First Name"
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                {% for error in personal_form.first_name.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- LAST NAME -->
+
+                            <div>
+
+                                <label
+                                    for="id_personal-last_name"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Last Name
+                                </label>
+
+                                <input
+                                    id="id_personal-last_name"
+                                    type="text"
+                                    name="personal-last_name"
+                                    value="{{ personal_form.last_name.value|default_if_none:'' }}"
+                                    autocomplete="family-name"
+                                    placeholder="Last Name"
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                {% for error in personal_form.last_name.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- USERNAME -->
+
+                            <div>
+
+                                <label
+                                    for="id_personal-username"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Username
+                                </label>
+
+                                <input
+                                    id="id_personal-username"
+                                    type="text"
+                                    name="personal-username"
+                                    value="{{ personal_form.username.value|default_if_none:'' }}"
+                                    autocomplete="username"
+                                    placeholder="Username"
+                                    required
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                {% for error in personal_form.username.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+
+                            <div>
+
+                                <label
+                                    for="id_personal-email"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Email Address
+                                </label>
+
+                                <input
+                                    id="id_personal-email"
+                                    type="email"
+                                    name="personal-email"
+                                    value="{{ personal_form.email.value|default_if_none:'' }}"
+                                    autocomplete="email"
+                                    placeholder="Email Address"
+                                    required
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                {% for error in personal_form.email.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ===================================== -->
+                    <!-- BUSINESS INFORMATION -->
+                    <!-- ===================================== -->
+
+                    {% if business_form %}
+
+                    <div class="my-6 border-t border-[#E1EAE5]"></div>
+
+                    <div>
+
+                        <h3 class="mb-4 text-base font-bold text-[#123C32]">
+                            Business Information
+                        </h3>
+
+
+                        <!-- BUSINESS LOGO -->
+
+                        <div class="mb-5 flex flex-wrap items-center gap-4">
+
+                            <div
+                                id="business-logo-preview"
+                                class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#E7EDF1] text-[#728390]"
+                            >
+
+                                {% if business.logo %}
+
+                                <img
+                                    src="{{ business.logo.url }}"
+                                    alt="Business logo"
+                                    class="h-full w-full object-cover"
+                                >
+
+                                {% else %}
+
+                                <i data-lucide="building-2" class="h-8 w-8"></i>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="min-w-0 flex-1">
+
+                                {% if is_owner %}
+
+                                <div class="flex flex-wrap items-center gap-2">
+
+                                    <label
+                                        for="id_business-logo"
+                                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-[#D4E0DA] bg-white px-4 py-2.5 text-xs font-semibold text-[#123C32] transition hover:bg-[#F1F8F4]"
+                                    >
+
+                                        <i data-lucide="upload" class="h-4 w-4"></i>
+
+                                        Upload Business Logo
+
+                                    </label>
+
+
+                                    <input
+                                        id="id_business-logo"
+                                        name="business-logo"
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp"
+                                        class="sr-only"
+                                    >
+
+
+                                    <input
+                                        id="business-logo-clear"
+                                        name="business-logo-clear"
+                                        type="checkbox"
+                                        class="hidden"
+                                    >
+
+
+                                    <button
+                                        type="button"
+                                        data-remove-image="business"
+                                        class="inline-flex items-center justify-center gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-100"
+                                        {% if not business.logo %}hidden{% endif %}
+                                    >
+
+                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+
+                                        Remove
+
+                                    </button>
+
+                                </div>
+
+
+                                <p
+                                    id="business-logo-status"
+                                    class="mt-2 text-xs text-[#64746D]"
+                                    aria-live="polite"
+                                >
+                                    JPG, PNG or WebP, maximum 10 MB.
+                                </p>
+
+
+                                {% for error in business_form.logo.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                                {% else %}
+
+                                <p class="text-xs text-[#64746D]">
+                                    Only the business owner can edit business details.
+                                </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- BUSINESS FIELDS -->
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+
+                            <!-- BUSINESS NAME -->
+
+                            <div>
+
+                                <label
+                                    for="id_business-name"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Business Name
+                                </label>
+
+                                <input
+                                    id="id_business-name"
+                                    type="text"
+                                    name="business-name"
+                                    value="{{ business_form.name.value|default_if_none:'' }}"
+                                    placeholder="Business Name"
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-100"
+                                    {% if is_owner %}required{% else %}disabled{% endif %}
+                                >
+
+                                {% for error in business_form.name.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- BUSINESS EMAIL -->
+
+                            <div>
+
+                                <label
+                                    for="id_business-email"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Business Email
+                                </label>
+
+                                <input
+                                    id="id_business-email"
+                                    type="email"
+                                    name="business-email"
+                                    value="{{ business_form.email.value|default_if_none:'' }}"
+                                    placeholder="Business Email"
+                                    class="block w-full min-w-0 rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-100"
+                                    {% if not is_owner %}disabled{% endif %}
+                                >
+
+                                {% for error in business_form.email.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- BUSINESS ADDRESS -->
+
+                            <div class="sm:col-span-2">
+
+                                <label
+                                    for="id_business-address"
+                                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                                >
+                                    Business Address
+                                </label>
+
+                                <textarea
+                                    id="id_business-address"
+                                    name="business-address"
+                                    rows="3"
+                                    placeholder="Business Address"
+                                    class="block w-full min-w-0 resize-y rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-100"
+                                    {% if not is_owner %}disabled{% endif %}
+                                >{{ business_form.address.value|default_if_none:'' }}</textarea>
+
+                                {% for error in business_form.address.errors %}
+
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ error }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- ===================================== -->
+                    <!-- SAVE INFORMATION -->
+                    <!-- ===================================== -->
+
+                    <div class="mt-auto pt-5">
+
+                        <button
+                            type="submit"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#007F5F] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#00694E]"
+                        >
+
+                            <i data-lucide="save" class="h-5 w-5"></i>
+
+                            Save Information
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- ===================================== -->
+            <!-- RIGHT COLUMN -->
+            <!-- ===================================== -->
+
+            <div class="flex min-w-0 flex-col gap-5 xl:col-span-2">
+
+
+                <!-- ===================================== -->
+                <!-- CHANGE PASSWORD -->
+                <!-- ===================================== -->
+
+                <section
+                    class="min-w-0 overflow-hidden rounded-xl border border-[#E1EAE5] bg-white shadow-sm"
+                >
+
+                    <!-- HEADER -->
+
+                    <div class="flex items-center gap-4 border-b border-[#E1EAE5] px-5 py-5 sm:px-6">
+
+                        <div
+                            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-[#E4F4ED] text-[#007F5F]"
+                        >
+
+                            <i data-lucide="shield-check" class="h-7 w-7"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2 class="text-lg font-bold text-[#123C32]">
+                                Change Password
+                            </h2>
+
+                            <p class="mt-1 text-xs text-[#64746D]">
+                                Keep your account secure.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PASSWORD FORM -->
+
+                    <form
+                        method="post"
+                        action="{% url 'settings' %}"
+                        class="space-y-5 px-5 py-5 sm:px-6"
+                    >
+
+                        {% csrf_token %}
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="security"
+                        >
+
+
+                        {% for error in security_form.non_field_errors %}
+
+                        <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">
+                            {{ error }}
+                        </p>
+
+                        {% endfor %}
+
+
+                        <!-- CURRENT PASSWORD -->
+
+                        <div>
+
+                            <label
+                                for="id_security-old_password"
+                                class="mb-2 block text-sm font-medium text-[#243C34]"
+                            >
+                                Current Password
+                            </label>
+
+                            <div class="relative">
+
+                                <input
+                                    id="id_security-old_password"
+                                    name="security-old_password"
+                                    type="password"
+                                    placeholder="Enter current password"
+                                    autocomplete="current-password"
+                                    required
+                                    class="block w-full rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 pr-12 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                <button
+                                    type="button"
+                                    data-password-toggle="id_security-old_password"
+                                    aria-label="Show password"
+                                    class="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#80919C] hover:text-[#123C32]"
+                                >
+
+                                    <i data-lucide="eye" class="h-5 w-5"></i>
+
+                                </button>
+
+                            </div>
+
+                            {% for error in security_form.old_password.errors %}
+
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ error }}
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- NEW PASSWORD -->
+
+                        <div>
+
+                            <label
+                                for="id_security-new_password1"
+                                class="mb-2 block text-sm font-medium text-[#243C34]"
+                            >
+                                New Password
+                            </label>
+
+                            <div class="relative">
+
+                                <input
+                                    id="id_security-new_password1"
+                                    name="security-new_password1"
+                                    type="password"
+                                    placeholder="Enter new password"
+                                    autocomplete="new-password"
+                                    required
+                                    class="block w-full rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 pr-12 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                <button
+                                    type="button"
+                                    data-password-toggle="id_security-new_password1"
+                                    aria-label="Show password"
+                                    class="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#80919C] hover:text-[#123C32]"
+                                >
+
+                                    <i data-lucide="eye" class="h-5 w-5"></i>
+
+                                </button>
+
+                            </div>
+
+                            {% for error in security_form.new_password1.errors %}
+
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ error }}
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- CONFIRM PASSWORD -->
+
+                        <div>
+
+                            <label
+                                for="id_security-new_password2"
+                                class="mb-2 block text-sm font-medium text-[#243C34]"
+                            >
+                                Confirm New Password
+                            </label>
+
+                            <div class="relative">
+
+                                <input
+                                    id="id_security-new_password2"
+                                    name="security-new_password2"
+                                    type="password"
+                                    placeholder="Confirm new password"
+                                    autocomplete="new-password"
+                                    required
+                                    class="block w-full rounded-lg border border-[#D6E1DB] bg-white px-4 py-3 pr-12 text-sm text-[#123C32] outline-none transition placeholder:text-gray-400 focus:border-[#007F5F] focus:ring-2 focus:ring-emerald-100"
+                                >
+
+                                <button
+                                    type="button"
+                                    data-password-toggle="id_security-new_password2"
+                                    aria-label="Show password"
+                                    class="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[#80919C] hover:text-[#123C32]"
+                                >
+
+                                    <i data-lucide="eye" class="h-5 w-5"></i>
+
+                                </button>
+
+                            </div>
+
+                            {% for error in security_form.new_password2.errors %}
+
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ error }}
+                            </p>
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <!-- UPDATE PASSWORD BUTTON -->
+
+                        <button
+                            type="submit"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#007F5F] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#00694E]"
+                        >
+
+                            <i data-lucide="lock-keyhole" class="h-5 w-5"></i>
+
+                            Update Password
+
+                        </button>
+
+                    </form>
+
+                </section>
+
+
+                <!-- ===================================== -->
+                <!-- DANGER ZONE -->
+                <!-- ===================================== -->
+
+                <section
+                    class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[#E1EAE5] bg-white shadow-sm"
+                >
+
+                    <!-- HEADER -->
+
+                    <div class="flex items-center gap-4 border-b border-[#E1EAE5] px-5 py-5 sm:px-6">
+
+                        <div
+                            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600"
+                        >
+
+                            <i data-lucide="triangle-alert" class="h-7 w-7"></i>
+
+                        </div>
+
+                        <div>
+
+                            <h2 class="text-lg font-bold text-[#123C32]">
+                                Danger Zone
+                            </h2>
+
+                            <p class="mt-1 text-xs text-[#64746D]">
+                                Permanently delete your account.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DANGER CONTENT -->
+
+                    <div class="flex flex-1 flex-col px-5 py-5 sm:px-6">
+
+                        <p class="text-sm leading-7 text-[#344B52]">
+                            This action cannot be undone.
+                            Your account and associated data
+                            will be permanently removed.
+                        </p>
+
+
+                        <button
+                            id="open-delete-modal"
+                            type="button"
+                            class="mt-auto flex w-full items-center justify-center gap-2 rounded-lg border border-red-400 bg-red-50 px-5 py-3.5 text-sm font-bold text-red-600 transition hover:bg-red-100"
+                        >
+
+                            <i data-lucide="trash-2" class="h-5 w-5"></i>
+
+                            Delete Account
+
+                        </button>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- DELETE ACCOUNT MODAL -->
+<!-- ===================================== -->
+
+<div
+    id="delete-account-modal"
+    class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-modal-title"
+    aria-hidden="true"
+>
+
+    <div
+        class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-7"
+    >
+
+        <div
+            class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600"
+        >
+
+            <i data-lucide="triangle-alert" class="h-6 w-6"></i>
+
+        </div>
+
+
+        <h2
+            id="delete-modal-title"
+            class="text-xl font-bold text-[#123C32]"
+        >
+            Delete your account?
+        </h2>
+
+
+        <p class="mt-2 text-sm leading-6 text-[#64746D]">
+            This action is permanent.
+            Enter your current password and type
+            <strong>DELETE</strong> to confirm.
+        </p>
+
+
+        <form
+            method="post"
+            action="{% url 'delete_account' %}"
+            class="mt-6 space-y-4"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- PASSWORD -->
+
+            <div>
+
+                <label
+                    for="delete-password"
+                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                >
+                    Current Password
+                </label>
+
+                <input
+                    id="delete-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                    class="block w-full rounded-lg border border-[#D6E1DB] px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                >
+
+            </div>
+
+
+            <!-- CONFIRM DELETE -->
+
+            <div>
+
+                <label
+                    for="delete-confirmation"
+                    class="mb-2 block text-sm font-medium text-[#243C34]"
+                >
+                    Type DELETE
+                </label>
+
+                <input
+                    id="delete-confirmation"
+                    name="confirmation"
+                    type="text"
+                    autocomplete="off"
+                    required
+                    class="block w-full rounded-lg border border-[#D6E1DB] px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                >
+
+            </div>
+
+
+            <!-- MODAL ACTIONS -->
+
+            <div class="flex flex-wrap justify-end gap-3 pt-3">
+
+                <button
+                    id="close-delete-modal"
+                    type="button"
+                    class="rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700"
+                >
+                    Permanently Delete
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+<script src="{% static 'js/settings.js' %}" defer></script>
+
+{% endblock %}

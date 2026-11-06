@@ -1,0 +1,238 @@
+
+{% extends "reports/base_reports.html" %}
+
+{% block report_content %}
+
+<!-- PAGE HEADER -->
+<div class="mb-6">
+    <h2 class="text-xl font-bold text-dark-green">
+        Returns Report
+    </h2>
+
+    <p class="mt-1 text-sm text-text-muted">
+        Track customer returns, refunds and returned stock.
+    </p>
+</div>
+
+<!-- SUMMARY CARDS -->
+<div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <!-- TOTAL RETURNS -->
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-text-muted">
+                Total Returns
+            </p>
+            <i data-lucide="rotate-ccw"
+               class="h-5 w-5 text-primary"></i>
+        </div>
+
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            {{ summary.total_returns }}
+        </p>
+    </div>
+
+    <!-- TOTAL REFUNDS -->
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-text-muted">
+                Total Refunds
+            </p>
+            <i data-lucide="wallet"
+               class="h-5 w-5 text-red-500"></i>
+        </div>
+
+        <p class="mt-3 text-3xl font-bold text-red-600">
+            £{{ summary.total_refunds|floatformat:2 }}
+        </p>
+    </div>
+
+    <!-- RESTOCKED UNITS -->
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-text-muted">
+                Restocked Units
+            </p>
+            <i data-lucide="package-check"
+               class="h-5 w-5 text-primary"></i>
+        </div>
+
+        <p class="mt-3 text-3xl font-bold text-primary">
+            {{ summary.restocked_units }}
+        </p>
+    </div>
+
+    <!-- DAMAGED UNITS -->
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+            <p class="text-sm text-text-muted">
+                Damaged Units
+            </p>
+            <i data-lucide="package-x"
+               class="h-5 w-5 text-red-500"></i>
+        </div>
+
+        <p class="mt-3 text-3xl font-bold text-red-600">
+            {{ summary.damaged_units }}
+        </p>
+    </div>
+
+</div>
+
+<!-- SECONDARY SUMMARY -->
+<div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">
+            Total Returned Units
+        </p>
+        <p class="mt-3 text-2xl font-bold text-dark-green">
+            {{ summary.total_units }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">
+            With Receipt
+        </p>
+        <p class="mt-3 text-2xl font-bold text-dark-green">
+            {{ summary.with_receipt }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">
+            Without Receipt
+        </p>
+        <p class="mt-3 text-2xl font-bold text-dark-green">
+            {{ summary.without_receipt }}
+        </p>
+    </div>
+
+</div>
+
+<!-- RETURN REASONS -->
+<section class="mb-7 overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Return Reasons
+        </h3>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[500px] text-left text-sm">
+
+            <thead class="bg-gray-50 text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Reason</th>
+                    <th class="px-5 py-4 text-right">Returns</th>
+                    <th class="px-5 py-4 text-right">Refunds</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+
+                {% for row in summary.reason_rows %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-5 py-4 font-medium text-dark-green">
+                        {{ row.reason|title }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right">
+                        {{ row.total }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right font-semibold text-red-600">
+                        £{{ row.refunds|floatformat:2 }}
+                    </td>
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="3"
+                        class="px-5 py-10 text-center text-text-muted">
+                        No returns found for this period.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- RETURN HISTORY -->
+<section class="overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+    <div class="border-b border-border-light p-5">
+        <h3 class="text-lg font-bold text-dark-green">
+            Recent Returns
+        </h3>
+
+        <p class="mt-1 text-xs text-text-muted">
+            Showing up to 100 active return transactions.
+        </p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[850px] text-left text-sm">
+
+            <thead class="bg-gray-50 text-xs uppercase text-text-muted">
+                <tr>
+                    <th class="px-5 py-4">Date</th>
+                    <th class="px-5 py-4">Reference</th>
+                    <th class="px-5 py-4">Customer</th>
+                    <th class="px-5 py-4">Reason</th>
+                    <th class="px-5 py-4">Type</th>
+                    <th class="px-5 py-4 text-right">Refund</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-border-light">
+
+                {% for item in recent_returns %}
+                <tr class="hover:bg-gray-50">
+
+                    <td class="px-5 py-4 text-text-muted">
+                        {{ item.created_at|date:"d M Y" }}
+                    </td>
+
+                    <td class="px-5 py-4 font-semibold text-dark-green">
+                        {{ item.reference|default:"—" }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ item.customer_name|default:"Walk-in Customer" }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ item.get_reason_display }}
+                    </td>
+
+                    <td class="px-5 py-4">
+                        {{ item.get_return_type_display }}
+                    </td>
+
+                    <td class="px-5 py-4 text-right font-semibold text-red-600">
+                        £{{ item.refund_amount|floatformat:2 }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6"
+                        class="px-5 py-12 text-center text-text-muted">
+                        No return transactions found.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+</section>
+
+{% endblock %}

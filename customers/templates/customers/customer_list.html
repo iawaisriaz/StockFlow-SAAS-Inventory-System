@@ -1,0 +1,191 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+{% include "partials/navbar.html" %}
+
+<div id="app-layout"
+     class="min-h-screen bg-page-bg lg:ml-64">
+
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-7">
+            <h1 class="text-3xl font-bold text-dark-green">
+                Customers
+            </h1>
+
+            <p class="mt-1 text-sm text-text-muted">
+                View customer records and purchase history.
+            </p>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="mb-7 grid gap-4 sm:grid-cols-2">
+
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-text-muted">
+                        Total Customers
+                    </p>
+                    <i data-lucide="users"
+                       class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-dark-green">
+                    {{ total_customers }}
+                </p>
+            </div>
+
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-text-muted">
+                        Repeat Customers
+                    </p>
+                    <i data-lucide="repeat"
+                       class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-primary">
+                    {{ repeat_customers }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- CUSTOMERS TABLE -->
+        <section class="overflow-hidden rounded-2xl border border-border-light bg-white shadow-sm">
+
+            <div class="border-b border-border-light p-5">
+
+                <h2 class="text-lg font-bold text-dark-green">
+                    All Customers
+                </h2>
+
+                <form method="get"
+                      class="mt-5 flex flex-wrap gap-3">
+
+                    <input
+                        type="search"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Search by name or phone..."
+                        class="h-12 min-w-0 flex-1 rounded-xl border border-border-light bg-white px-4 text-sm outline-none focus:border-primary"
+                    >
+
+                    <button
+                        type="submit"
+                        class="rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark">
+                        Search
+                    </button>
+
+                    {% if search %}
+                    <a href="{% url 'customers:list' %}"
+                       class="rounded-xl border border-border-light px-5 py-3 text-sm font-semibold text-dark-green">
+                        Clear
+                    </a>
+                    {% endif %}
+
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+
+                    <thead class="bg-page-bg text-text-muted">
+                        <tr>
+                            <th class="px-5 py-4">Customer</th>
+                            <th class="px-5 py-4">Phone</th>
+                            <th class="px-5 py-4">Purchases</th>
+                            <th class="px-5 py-4">Total Spent</th>
+                            <th class="px-5 py-4">Last Purchase</th>
+                            <th class="px-5 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-border-light">
+
+                        {% for customer in customers %}
+
+                        <tr class="hover:bg-page-bg">
+
+                            <td class="px-5 py-4">
+                                <p class="font-semibold text-dark-green">
+                                    {{ customer.display_name }}
+                                </p>
+
+                                <p class="mt-1 text-xs text-text-muted">
+                                    {{ customer.customer_code }}
+                                </p>
+                            </td>
+
+                            <td class="px-5 py-4 text-text-main">
+                                {{ customer.phone|default:"Not provided" }}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                {{ customer.total_orders }}
+                            </td>
+
+                            <td class="px-5 py-4 font-semibold text-dark-green">
+                                £{{ customer.total_spent|floatformat:2 }}
+                            </td>
+
+                            <td class="px-5 py-4 text-text-muted">
+                                {% if customer.last_purchase %}
+                                    {{ customer.last_purchase|date:"d M Y" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td class="px-5 py-4 text-right">
+                                <a href="{% url 'customers:detail' customer.pk %}"
+                                   class="inline-flex rounded-lg bg-soft-green px-4 py-2 text-xs font-semibold text-primary hover:bg-green-100">
+                                    View Details
+                                </a>
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+                            <td colspan="6"
+                                class="px-5 py-14 text-center">
+
+                                <i data-lucide="users"
+                                   class="mx-auto mb-3 h-9 w-9 text-text-muted"></i>
+
+                                <p class="font-semibold text-dark-green">
+                                    No customers found
+                                </p>
+
+                                <p class="mt-2 text-sm text-text-muted">
+                                    Customer records appear automatically
+                                    when sales include a name or phone.
+                                </p>
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/navbar.js' %}"></script>
+<script src="{% static 'js/header.js' %}"></script>
+{% endblock %}

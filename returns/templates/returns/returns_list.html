@@ -1,0 +1,453 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% include "partials/navbar.html" %}
+
+<div id="app-layout" class="min-h-screen bg-page-bg lg:ml-64">
+    {% include "partials/header.html" %}
+
+    <main class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+        <!-- PAGE HEADER -->
+        <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-dark-green">
+                    Returns
+                </h1>
+                <p class="mt-1 text-sm text-text-muted">
+                    Manage daily returns and refund history.
+                </p>
+            </div>
+
+            {% if can_add_return %}
+            <a href="{% url 'returns:new' %}"
+               class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark">
+                <i data-lucide="plus" class="h-4 w-4"></i>
+                New Return
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- MESSAGES -->
+        {% if messages %}
+        <div class="mb-6 space-y-3">
+            {% for message in messages %}
+            <div class="flex items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-5 py-4 text-sm shadow-sm">
+                <div class="flex items-center gap-3">
+                    {% if message.tags == "error" %}
+                    <i data-lucide="circle-x"
+                       class="h-5 w-5 text-red-600"></i>
+                    {% else %}
+                    <i data-lucide="check-circle-2"
+                       class="h-5 w-5 text-primary"></i>
+                    {% endif %}
+
+                    <span class="text-dark-green">
+                        {{ message }}
+                    </span>
+                </div>
+
+                <button type="button"
+                        data-dismiss-message
+                        class="text-text-muted hover:text-dark-green">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- SUMMARY CARDS -->
+        <div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+            <!-- TOTAL RETURNS -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Total Returns
+                    </span>
+
+                    <i data-lucide="package-rotate-ccw"
+                       class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-dark-green">
+                    {{ total_returns }}
+                </p>
+            </div>
+
+            <!-- TOTAL REFUNDS -->
+            <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-text-muted">
+                        Total Refunds
+                    </span>
+
+                    <i data-lucide="pound-sterling"
+                       class="h-5 w-5 text-primary"></i>
+                </div>
+
+                <p class="mt-4 text-3xl font-bold text-primary">
+                    £{{ total_refunded|floatformat:2 }}
+                </p>
+            </div>
+
+        </div>
+
+        <!-- RETURNS TABLE SECTION -->
+        <section class="rounded-2xl border border-border-light bg-white shadow-sm">
+
+            <!-- FILTERS -->
+            <div class="border-b border-border-light p-5">
+
+                <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-dark-green">
+                            {{ period_label }}
+                        </h2>
+
+                        <p class="mt-1 text-xs text-text-muted">
+                            Summary cards reflect selected filters.
+                        </p>
+                    </div>
+
+                    {% if period == "today" %}
+                    <span class="rounded-full bg-soft-green px-3 py-1.5 text-xs font-semibold text-primary">
+                        {{ today }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <form method="get"
+                      id="returns-filter-form"
+                      class="flex flex-wrap items-end gap-3">
+
+                    <!-- SEARCH -->
+                    <div class="min-w-[180px] flex-1">
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Search
+                        </label>
+
+                        <input type="search"
+                               name="search"
+                               value="{{ search }}"
+                               placeholder="Reference, customer or product..."
+                               class="h-12 w-full rounded-xl border border-border-light bg-white px-4 text-sm text-dark-green outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    </div>
+
+                    <!-- PERIOD DROPDOWN -->
+                    <div class="w-full sm:w-48">
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Date Range
+                        </label>
+
+                        <div class="relative" data-return-dropdown>
+
+                            <input type="hidden"
+                                   name="period"
+                                   value="{{ period }}"
+                                   data-dropdown-input>
+
+                            <button type="button"
+                                    data-dropdown-trigger
+                                    aria-expanded="false"
+                                    class="flex h-12 w-full items-center justify-between gap-3 rounded-xl border border-border-light bg-white px-4 text-left text-sm font-medium text-dark-green transition hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
+
+                                <span data-dropdown-label>
+                                    {% if period == "date" %}
+                                        Select Date
+                                    {% elif period == "range" %}
+                                        Date Range
+                                    {% elif period == "all" %}
+                                        All Returns
+                                    {% else %}
+                                        Today
+                                    {% endif %}
+                                </span>
+
+                                <i data-lucide="chevron-down"
+                                   class="h-4 w-4 shrink-0 text-text-muted"></i>
+                            </button>
+
+                            <div data-dropdown-menu
+                                 class="absolute left-0 top-full z-50 mt-2 hidden w-full rounded-xl border border-border-light bg-white p-1.5 shadow-xl">
+
+                                <button type="button"
+                                        data-dropdown-option
+                                        data-value="today"
+                                        class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green">
+                                    Today
+                                </button>
+
+                                <button type="button"
+                                        data-dropdown-option
+                                        data-value="date"
+                                        class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green">
+                                    Select Date
+                                </button>
+
+                                <button type="button"
+                                        data-dropdown-option
+                                        data-value="range"
+                                        class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green">
+                                    Date Range
+                                </button>
+
+                                <button type="button"
+                                        data-dropdown-option
+                                        data-value="all"
+                                        class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-dark-green hover:bg-soft-green">
+                                    All Returns
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SINGLE DATE -->
+                    <div id="returns-date-wrapper"
+                         class="w-full sm:w-44 {% if period != 'date' %}hidden{% endif %}">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Return Date
+                        </label>
+
+                        <input type="date"
+                               name="date"
+                               id="returns-date"
+                               value="{{ selected_date|default:today }}"
+                               max="{{ today }}"
+                               class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    </div>
+
+                    <!-- START DATE -->
+                    <div id="returns-range-start-wrapper"
+                         class="w-full sm:w-44 {% if period != 'range' %}hidden{% endif %}">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            Start Date
+                        </label>
+
+                        <input type="date"
+                               name="start_date"
+                               id="returns-start-date"
+                               value="{{ start_date|default:today }}"
+                               max="{{ today }}"
+                               class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    </div>
+
+                    <!-- END DATE -->
+                    <div id="returns-range-end-wrapper"
+                         class="w-full sm:w-44 {% if period != 'range' %}hidden{% endif %}">
+
+                        <label class="mb-2 block text-xs font-semibold text-text-muted">
+                            End Date
+                        </label>
+
+                        <input type="date"
+                               name="end_date"
+                               id="returns-end-date"
+                               value="{{ end_date|default:today }}"
+                               max="{{ today }}"
+                               class="h-12 w-full rounded-xl border border-border-light bg-white px-3 text-sm text-dark-green outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    </div>
+
+                    <!-- APPLY -->
+                    <button type="submit"
+                            class="h-12 rounded-xl bg-primary px-6 text-sm font-semibold text-white hover:bg-primary-dark">
+                        Apply
+                    </button>
+
+                    <!-- CLEAR -->
+                    {% if has_filters %}
+                    <a href="{% url 'returns:list' %}"
+                       class="inline-flex h-12 items-center gap-2 rounded-xl border border-border-light bg-white px-5 text-sm font-semibold text-dark-green hover:bg-page-bg">
+
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                        Clear
+                    </a>
+                    {% endif %}
+
+                </form>
+            </div>
+
+            <!-- TABLE -->
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[750px] text-left">
+
+                    <thead class="bg-page-bg text-xs uppercase text-text-muted">
+                        <tr>
+                            <th class="px-5 py-4">Reference</th>
+                            <th class="px-5 py-4">Original Sale</th>
+                            <th class="px-5 py-4">Customer</th>
+                            <th class="px-5 py-4">Date</th>
+                            <th class="px-5 py-4">Refund</th>
+                            <th class="px-5 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-border-light">
+
+                        {% for item in returns %}
+                        <tr class="transition hover:bg-page-bg">
+
+                            <!-- RETURN REFERENCE -->
+                            <td class="px-5 py-4 text-sm font-semibold text-dark-green">
+                                {{ item.reference }}
+                            </td>
+
+                            <!-- ORIGINAL SALE -->
+                            <td class="px-5 py-4 text-sm">
+
+                                {% if item.sale %}
+                                {% if can_view_sales %}
+                                <a href="{% url 'sales:detail' item.sale.pk %}"
+                                   class="font-medium text-primary hover:underline">
+                                    {{ item.sale.reference }}
+                                </a>
+                                {% else %}
+                                <span class="font-medium text-dark-green">{{ item.sale.reference }}</span>
+                                {% endif %}
+                                {% else %}
+                                <span class="text-text-muted">
+                                    No Receipt
+                                </span>
+                                {% endif %}
+
+                            </td>
+
+                            <!-- CUSTOMER -->
+                            <td class="px-5 py-4 text-sm text-dark-green">
+                                {{ item.customer_name|default:"Walk-in Customer" }}
+                            </td>
+
+                            <!-- DATE -->
+                            <td class="px-5 py-4 text-sm text-text-muted">
+                                {{ item.created_at|date:"d M Y, h:i A" }}
+                            </td>
+
+                            <!-- REFUND -->
+                            <td class="px-5 py-4 text-sm font-semibold text-dark-green">
+                                £{{ item.refund_amount|floatformat:2 }}
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td class="px-5 py-4">
+                                <div class="flex items-center justify-end gap-1">
+
+                                    <!-- VIEW -->
+                                    <a href="{% url 'returns:detail' item.pk %}"
+                                       title="View Return"
+                                       class="rounded-lg p-2 text-text-muted transition hover:bg-soft-green hover:text-primary">
+
+                                        <i data-lucide="eye" class="h-4 w-4"></i>
+                                    </a>
+
+                                    {% if can_delete_return %}
+                                    <!-- DELETE -->
+                                    <button type="button"
+                                            data-delete-return
+                                            data-return-reference="{{ item.reference }}"
+                                            data-delete-url="{% url 'returns:delete' item.pk %}"
+                                            title="Delete Return"
+                                            class="rounded-lg p-2 text-red-500 transition hover:bg-red-50 hover:text-red-600">
+
+                                        <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                    </button>
+                                    {% endif %}
+
+                                </div>
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-5 py-14 text-center">
+
+                                <i data-lucide="package-search"
+                                   class="mx-auto mb-3 h-9 w-9 text-text-muted"></i>
+
+                                <p class="text-sm font-medium text-dark-green">
+                                    No returns found.
+                                </p>
+
+                                <p class="mt-2 text-xs text-text-muted">
+                                    Change the date range or filters to view other returns.
+                                </p>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+{% if can_delete_return %}
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="delete-return-modal"
+     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/50 p-4"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true">
+
+    <div class="w-full max-w-md rounded-2xl border border-border-light bg-white p-6 shadow-2xl sm:p-8">
+
+        <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+            <i data-lucide="trash-2"
+               class="h-7 w-7 text-red-600"></i>
+        </div>
+
+        <h2 class="text-xl font-bold text-dark-green">
+            Delete Return?
+        </h2>
+
+        <p class="mt-3 text-sm leading-6 text-text-muted">
+            Delete
+            <span id="delete-return-reference"
+                  class="font-semibold text-dark-green"></span>
+            from active records?
+        </p>
+
+        <p class="mt-3 text-sm leading-6 text-text-muted">
+            Restocked inventory will be reversed if sufficient
+            stock is available. The return will remain in
+            the audit history. Any money already refunded
+            must be handled separately.
+        </p>
+
+        <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+            <button type="button"
+                    id="close-delete-return-modal"
+                    class="rounded-xl border border-border-light bg-white px-5 py-3 text-sm font-semibold text-dark-green hover:bg-page-bg">
+                Keep Return
+            </button>
+
+            <form method="post" id="delete-return-form">
+                {% csrf_token %}
+
+                <button type="submit"
+                        id="confirm-delete-return"
+                        class="w-full rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700">
+                    Yes, Delete Return
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/navbar.js' %}" defer></script>
+<script src="{% static 'js/header.js' %}" defer></script>
+<script src="{% static 'js/returns.js' %}" defer></script>
+{% endblock %}

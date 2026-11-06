@@ -1,0 +1,391 @@
+<dialog
+    id="product-modal"
+    class="m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-2xl border-0 bg-white p-0 shadow-2xl backdrop:bg-black/50"
+>
+
+    <!-- MODAL HEADER -->
+    <div class="sticky top-0 z-10 flex items-center justify-between border-b border-border-light bg-white px-6 py-5">
+
+        <div>
+            <h2 id="product-modal-title" class="text-xl font-bold text-dark-green">
+                Add New Product
+            </h2>
+
+            <p class="mt-1 text-sm text-text-muted">
+                Enter the product information below.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            data-close-dialog="product-modal"
+            class="rounded-lg p-2 text-text-muted hover:bg-page-bg"
+        >
+            <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+
+    </div>
+
+    <!-- PRODUCT FORM -->
+    <form
+        id="product-form"
+        method="post"
+        action="{% url 'products:add' %}"
+        data-add-url="{% url 'products:add' %}"
+        enctype="multipart/form-data"
+    >
+        {% csrf_token %}
+
+        <div class="space-y-5 px-6 py-6">
+
+            <!-- NAME AND SKU -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                <div>
+                    <label for="product-name" class="mb-2 block text-sm font-semibold text-dark-green">
+                        Product Name <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="product-name"
+                        name="name"
+                        maxlength="150"
+                        required
+                        placeholder="e.g. 20W USB-C Fast Charger"
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+                </div>
+
+                <div>
+                    <label for="product-sku" class="mb-2 block text-sm font-semibold text-dark-green">
+                        SKU <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="product-sku"
+                        name="sku"
+                        maxlength="50"
+                        required
+                        placeholder="e.g. CHG-USB-001"
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+                </div>
+
+            </div>
+
+            <!-- SEARCHABLE CATEGORY -->
+            <div class="relative" id="product-category-wrapper">
+
+                <label class="mb-2 block text-sm font-semibold text-dark-green">
+                    Category <span class="text-red-500">*</span>
+                </label>
+
+                <input
+                    type="hidden"
+                    id="product-category"
+                    name="category"
+                >
+
+                <button
+                    type="button"
+                    id="product-category-trigger"
+                    aria-expanded="false"
+                    class="flex w-full items-center justify-between gap-2 rounded-xl border border-border-light bg-white px-4 py-3 text-left text-sm text-text-main transition hover:border-primary/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+                >
+                    <span id="product-category-label" class="truncate text-text-muted">
+                        Select Category
+                    </span>
+
+                    <i data-lucide="chevron-down" class="h-4 w-4 shrink-0 text-text-muted"></i>
+                </button>
+
+                <div
+                    id="product-category-dropdown"
+                    class="absolute left-0 right-0 top-full z-50 mt-2 hidden overflow-hidden rounded-xl border border-border-light bg-white shadow-xl"
+                >
+
+                    <div class="border-b border-border-light p-3">
+                        <input
+                            type="search"
+                            id="product-category-search"
+                            placeholder="Search categories..."
+                            autocomplete="off"
+                            class="w-full rounded-lg border border-border-light px-3 py-2.5 text-sm outline-none focus:border-primary"
+                        >
+                    </div>
+
+                    <div class="max-h-52 overflow-y-auto py-1">
+
+                        {% for category in categories %}
+
+                        <button
+                            type="button"
+                            class="product-category-option flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm hover:bg-soft-green hover:text-primary"
+                            data-value="{{ category.pk }}"
+                            data-label="{{ category.name }}"
+                        >
+                            <span class="truncate">{{ category.name }}</span>
+
+                            <i data-lucide="check" class="option-check hidden h-4 w-4 text-primary"></i>
+                        </button>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <p
+                        id="product-category-empty"
+                        class="hidden px-4 py-4 text-center text-sm text-text-muted"
+                    >
+                        No categories found.
+                    </p>
+
+                </div>
+
+                <p
+                    id="product-category-error"
+                    class="mt-2 hidden text-xs font-medium text-red-600"
+                >
+                    Please select a category.
+                </p>
+
+                {% if not categories %}
+
+                <p class="mt-2 text-xs text-red-600">
+                    Create a category before adding products.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div>
+
+                <label for="product-description" class="mb-2 block text-sm font-semibold text-dark-green">
+                    Description
+                    <span class="font-normal text-text-muted">(Optional)</span>
+                </label>
+
+                <textarea
+                    id="product-description"
+                    name="description"
+                    rows="3"
+                    maxlength="1000"
+                    placeholder="Enter a short product description..."
+                    class="w-full resize-none rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                ></textarea>
+
+            </div>
+
+            <!-- PRICES -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+                <div>
+
+                    <label for="product-cost" class="mb-2 block text-sm font-semibold text-dark-green">
+                        Cost Price (£) <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="product-cost"
+                        name="cost_price"
+                        min="0"
+                        step="0.01"
+                        required
+                        placeholder="0.00"
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                </div>
+
+                <div>
+                    <label for="product-markup" class="mb-2 block text-sm font-semibold text-dark-green">Markup (%)</label>
+                    <input type="number" id="product-markup" min="-100" step="any" placeholder="e.g. 20"
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10">
+                    <p class="mt-2 text-xs text-text-muted">Percentage added to cost price.</p>
+                </div>
+
+                <div>
+
+                    <label for="product-price" class="mb-2 block text-sm font-semibold text-dark-green">
+                        Selling Price (£) <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="product-price"
+                        name="selling_price"
+                        min="0"
+                        step="0.01"
+                        required
+                        placeholder="0.00"
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                </div>
+
+            </div>
+
+            <p id="product-profit-preview" class="text-xs font-medium text-text-muted" aria-live="polite">Enter prices to preview profit per unit.</p>
+
+            <!-- STOCK FIELDS -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                <div id="opening-stock-wrapper">
+
+                    <label for="product-stock" class="mb-2 block text-sm font-semibold text-dark-green">
+                        <span id="product-stock-label">Opening Stock</span>
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="product-stock"
+                        name="stock_quantity"
+                        min="0"
+                        max="2147483647"
+                        step="1"
+                        value="0"
+                        required
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                    <p id="product-stock-help" class="mt-2 text-xs text-text-muted">
+                        Initial quantity when creating a product.
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <label for="product-alert" class="mb-2 block text-sm font-semibold text-dark-green">
+                        Low Stock Alert <span class="text-red-500">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="product-alert"
+                        name="low_stock_threshold"
+                        min="0"
+                        max="2147483647"
+                        step="1"
+                        value="5"
+                        required
+                        class="w-full rounded-xl border border-border-light px-4 py-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    >
+
+                    <p class="mt-2 text-xs text-text-muted">
+                        Warn when stock reaches this quantity.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- PRODUCT IMAGE -->
+            <div>
+
+                <label for="product-image" class="mb-2 block text-sm font-semibold text-dark-green">
+                    Product Image
+                    <span class="font-normal text-text-muted">(Optional)</span>
+                </label>
+
+                <!-- CURRENT IMAGE -->
+                <div
+                    id="current-image-wrapper"
+                    class="mb-4 hidden rounded-xl border border-border-light bg-page-bg p-4"
+                >
+
+                    <div class="flex items-center gap-4">
+
+                        <img
+                            id="current-product-image"
+                            alt="Current product image"
+                            class="h-20 w-20 rounded-xl border border-border-light bg-white object-cover"
+                        >
+
+                        <div class="flex-1">
+
+                            <p class="text-sm font-semibold text-dark-green">
+                                Current Image
+                            </p>
+
+                            <p class="mt-1 text-xs text-text-muted">
+                                Keep, replace or remove this image.
+                            </p>
+
+                            <button
+                                type="button"
+                                id="remove-product-image"
+                                class="mt-3 inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                            >
+                                <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                Remove Image
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- IMAGE INPUT -->
+                <input
+                    type="file"
+                    id="product-image"
+                    name="image"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="block w-full rounded-xl border border-border-light bg-white p-3 text-sm text-text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-soft-green file:px-4 file:py-2 file:font-semibold file:text-primary"
+                >
+
+                <input
+                    type="hidden"
+                    name="remove_image"
+                    id="remove-image-flag"
+                    value="0"
+                >
+
+                <p class="mt-2 text-xs text-text-muted">
+                    JPG, PNG or WEBP. Maximum 5 MB.
+                </p>
+
+                <p
+                    id="image-removal-message"
+                    class="mt-2 hidden text-xs font-medium text-red-600"
+                >
+                    Image will be removed when you save changes.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- FORM FOOTER -->
+        <div class="sticky bottom-0 flex justify-end gap-3 border-t border-border-light bg-white px-6 py-4">
+
+            <button
+                type="button"
+                data-close-dialog="product-modal"
+                class="rounded-xl border border-border-light px-5 py-2.5 text-sm font-semibold text-dark-green hover:bg-page-bg"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="submit"
+                class="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+            >
+                <span id="product-submit-text">
+                    Save Product
+                </span>
+            </button>
+
+        </div>
+
+    </form>
+
+</dialog>

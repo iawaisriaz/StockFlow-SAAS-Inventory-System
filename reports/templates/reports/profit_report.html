@@ -1,0 +1,120 @@
+{% extends "reports/base_reports.html" %}
+
+{% block report_content %}
+
+<div class="mb-6">
+    <h2 class="text-xl font-bold text-dark-green">
+        Profit Report
+    </h2>
+    <p class="mt-1 text-sm text-text-muted">
+        Analyse revenue, cost of goods sold and gross profit.
+    </p>
+</div>
+
+<div class="mb-7 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Net Sales</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            £{{ summary.net_sales|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Net COGS</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            £{{ summary.net_cogs|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Gross Profit</p>
+        <p class="mt-3 text-3xl font-bold text-primary">
+            £{{ summary.gross_profit|floatformat:2 }}
+        </p>
+    </div>
+
+    <div class="rounded-2xl border border-border-light bg-white p-5 shadow-sm">
+        <p class="text-sm text-text-muted">Gross Profit Margin</p>
+        <p class="mt-3 text-3xl font-bold text-dark-green">
+            {{ summary.profit_margin|floatformat:2 }}%
+        </p>
+    </div>
+
+</div>
+
+<section class="rounded-2xl border border-border-light bg-white p-6 shadow-sm">
+
+    <h3 class="mb-6 text-lg font-bold text-dark-green">
+        Profit Breakdown
+    </h3>
+
+    <div class="space-y-5">
+
+        <div class="flex items-center justify-between gap-4">
+            <span class="text-sm text-text-muted">Gross Sales</span>
+            <span class="font-semibold text-dark-green">
+                £{{ summary.gross_sales|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+            <span class="text-sm text-text-muted">Less: Refunds</span>
+            <span class="font-semibold text-red-600">
+                −£{{ summary.refunds|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 border-t border-border-light pt-5">
+            <span class="font-semibold text-dark-green">Net Sales</span>
+            <span class="font-bold text-primary">
+                £{{ summary.net_sales|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+            <span class="text-sm text-text-muted">
+                Original Cost of Goods Sold
+            </span>
+            <span class="font-semibold text-dark-green">
+                £{{ summary.original_cogs|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+            <span class="text-sm text-text-muted">
+                Less: Good Returns Cost Reversal
+            </span>
+            <span class="font-semibold text-primary">
+                −£{{ summary.returned_cogs|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 border-t border-border-light pt-5">
+            <span class="font-semibold text-dark-green">Net COGS</span>
+            <span class="font-bold text-dark-green">
+                £{{ summary.net_cogs|floatformat:2 }}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 rounded-xl bg-soft-green p-5">
+            <span class="font-bold text-dark-green">Gross Profit</span>
+            <span class="text-2xl font-bold text-primary">
+                £{{ summary.gross_profit|floatformat:2 }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="mt-6 rounded-xl border border-border-light bg-gray-50 p-4">
+        <p class="text-xs leading-6 text-text-muted">
+            Gross Profit = Net Sales − Net COGS.
+            Good returns reverse their original product cost.
+            Damaged returns do not restore sellable stock or reverse COGS.
+            Operating expenses, taxes and overheads are not included.
+        </p>
+    </div>
+
+</section>
+
+{% endblock %}
